@@ -17,4 +17,4 @@ The following `bitsandbytes` quantization config was used during training:
 ### Framework versions
 
 
-- PEFT 0.4.0.dev0
+- PEFT 0.5.0.dev0

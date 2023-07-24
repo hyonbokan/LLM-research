@@ -1,4 +1,5 @@
 {
+  "auto_mapping": null,
   "base_model_name_or_path": "decapoda-research/llama-7b-hf",
   "bias": "none",
   "fan_in_fan_out": false,
