@@ -1,0 +1,89 @@
+True or False: BGP is a standardized exterior gateway protocol used for routing between autonomous systems (ASes).
+Answer: True
+
+True or False: BGP routers exchange their entire routing tables during the BGP peering process.
+Answer: False
+
+True or False: BGP is a distance-vector routing protocol.
+Answer: False
+
+True or False: BGP path attributes are used to provide information about the path a route has traversed.
+Answer: True
+
+True or False: The AS-PATH attribute in BGP lists the ASes that a route has traversed in reverse order.
+Answer: True
+
+True or False: The LOCAL-PREF attribute in BGP is used to indicate the preferred exit point from an AS.
+Answer: True
+
+True or False: BGP MED (Multi-Exit Discriminator) attribute is used to compare routes from different ASes.
+Answer: True
+
+True or False: BGP uses the EIGRP (Enhanced Interior Gateway Routing Protocol) algorithm for route selection.
+Answer: False
+
+True or False: The BGP NOTIFICATION message is used to establish a BGP session between peers.
+Answer: False
+
+True or False: Route hijacking in BGP occurs when a malicious AS falsely advertises IP prefixes it doesn't own.
+Answer: True
+
+True or False: BGP route aggregation involves combining multiple IP prefixes into a single, summarized route.
+Answer: True
+
+True or False: BGP route reflectors help alleviate the full mesh requirement in BGP peerings.
+Answer: True
+
+True or False: BGP confederations are used to divide an AS into multiple sub-ASes for better scalability.
+Answer: True
+
+True or False: BGP communities are used to group routes into categories and apply policies to specific routes.
+Answer: True
+
+True or False: BGP path attributes include NEXT-HOP, MED, and COMMUNITY.
+Answer: True
+
+True or False: BGP UPDATE messages are used to advertise new or withdrawn routes to BGP peers.
+Answer: True
+
+True or False: BGP KEEPALIVE messages are used to ensure that the BGP session between peers remains active.
+Answer: True
+
+True or False: BGP routers use TCP port 80 for communication.
+Answer: False
+
+True or False: BGP convergence refers to the process of exchanging BGP route updates and achieving a consistent routing table.
+Answer: True
+
+True or False: BGP routers typically use OSPF (Open Shortest Path First) as their underlying routing protocol.
+Answer: False
+
+True or False: BGP monitoring and analysis tools help network administrators detect route leaks and hijacks.
+Answer: True
+
+True or False: The BGP NEXT-HOP attribute indicates the IP address of the router that should be used as the next hop for the advertised route.
+Answer: True
+
+True or False: BGP routers do not consider the MED attribute when selecting the best path for routing.
+Answer: False
+
+True or False: BGP route dampening is a mechanism used to reduce the impact of route flapping on the network.
+Answer: True
+
+True or False: BGP route dampening can cause routes to be temporarily suppressed if they are unstable.
+Answer: True
+
+True or False: BGP routers use TTL (Time-to-Live) values to prevent routing loops.
+Answer: True
+
+True or False: BGP is commonly used for routing within a single autonomous system (AS).
+Answer: False
+
+True or False: BGP protocol uses UDP as its transport protocol for communication.
+Answer: False
+
+True or False: BGP routers can use route filtering to prevent the propagation of specific routes to certain peers.
+Answer: True
+
+True or False: BGP routers prioritize shortest AS-PATH lengths when selecting the best route.
+Answer: False
