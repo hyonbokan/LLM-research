@@ -1,2 +1,2 @@
-# Research on fine-tuning foundational LLM - LLaMA
+# fine-tuning-alpaca
 

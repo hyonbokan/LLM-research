@@ -23,7 +23,7 @@ import fire
 
 def encode_prompt(prompt_instructions):
     """Encode multiple prompt instructions into a single string."""
-    prompt = open("./prompt.txt").read() + "\n"
+    prompt = open("/home/hb/LLM-research/prompt_pybgpstream.txt").read() + "\n"
     print("prompt file found")
     for idx, task_dict in enumerate(prompt_instructions):
         (instruction, input, output) = task_dict["instruction"], task_dict["input"], task_dict["output"]
@@ -105,12 +105,12 @@ def find_word_in_string(w, s):
 
 
 def generate_instruction_following_data(
-    output_dir="/home/hb/fine-tuning-alpaca/finetuning_dataset",
-    seed_tasks_path="/home/hb/fine-tuning-alpaca/finetuning_dataset/seed_tasks.jsonl",
+    output_dir="/home/hb/LLM-research/finetuning_dataset",
+    seed_tasks_path="/home/hb/LLM-research/finetuning_dataset/seed_tasks_pybpg.jsonl",
     num_instructions_to_generate=100, #Change to disired number of instructions
     model_name="text-davinci-003",
-    num_prompt_instructions=3,
-    request_batch_size=5,
+    num_prompt_instructions=2,
+    request_batch_size=1, # Change it to have the GPT generate fewer instructions
     temperature=1.0,
     top_p=1.0,
     num_cpus=16,
@@ -156,7 +156,7 @@ def generate_instruction_following_data(
         decoding_args = utils.OpenAIDecodingArguments(
             temperature=temperature,
             n=1,
-            max_tokens=3072,  # hard-code to maximize the length. the requests will be automatically adjusted
+            max_tokens=5072,  # hard-code to maximize the length. the requests will be automatically adjusted
             top_p=top_p,
             stop=["\n20", "20.", "20."],
         )
