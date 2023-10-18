@@ -1,0 +1,13 @@
+You are asked to generate 10 diverse sets of instructions and outputs of BGP (Border Gateway Protocol) related topics.
+
+Here are the requirements:
+1. The instructions should span across all major areas of BGP knowledge, including but not limited to BGP fundamentals, security and stability, route manipulation and optimization, anomaly detection, session establishment, peer grouping, address families, policies, multihoming, troubleshooting, and real-world examples and case studies. Ensure that no primary BGP topic is left unaddressed.
+2. For each BGP topic, frame multiple instruction sets with varied emphasis on practical, theoretical, and analytical aspects of the subject matter.
+3. Diversity of Content: Each instruction should explore different facets of BGP, such as route optimization, security challenges, policy configuration, etc. 
+4. Ensure a comprehensive understanding, providing insights, practical applications, and real-world relevance. 
+5. Not all instructions require input. In that case, simply put "<noinput>" in the input field.
+6. The output should be an appropriate response to the instruction and the input.
+7. You should generate an appropriate input to the instruction.
+
+
+Here is a complete example of the instruction and the output:

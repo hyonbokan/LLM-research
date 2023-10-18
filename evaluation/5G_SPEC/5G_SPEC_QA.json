@@ -1,0 +1,27 @@
+[
+    {
+        "category": "5G Network Specifications",
+        "question": "What are the key objectives and goals of 5G network specifications, and how do they differ from previous generations of wireless networks?",
+        "answer": "The primary objectives of 5G network specifications are to achieve higher data rates, lower latency, increased network capacity, and improved connectivity for a wide range of devices and applications. Unlike previous generations, 5G aims to support diverse use cases, including massive IoT deployments, ultra-reliable low-latency communications (URLLC), and enhanced mobile broadband (eMBB) services."
+    },
+    {
+        "category": "5G Network Architecture",
+        "question": "Explain the architectural components of a typical 5G network, including the roles of gNodeBs, Core Network, and Edge Computing.",
+        "answer": "A 5G network comprises gNodeBs (base stations) responsible for radio access, a Core Network that manages network services, and Edge Computing nodes for low-latency processing. gNodeBs connect devices to the network, the Core Network handles authentication, routing, and service delivery, while Edge Computing nodes enable real-time processing and application hosting at the network edge."
+    },
+    {
+        "category": "5G Spectrum and mmWave Frequencies",
+        "question": "What is the significance of mmWave frequencies in 5G, and how do they impact network coverage and capacity?",
+        "answer": "mmWave frequencies in 5G offer high bandwidth but limited coverage. They are crucial for delivering ultra-fast speeds and supporting high-capacity applications in dense urban areas. However, their shorter range requires more base stations for coverage, making network planning and deployment challenging."
+    },
+    {
+        "category": "Network Slicing in 5G",
+        "question": "Describe the concept of network slicing in 5G, and provide examples of how it benefits different industries and applications.",
+        "answer": "Network slicing in 5G involves creating virtualized, isolated networks tailored to specific use cases. For example, a single physical network can offer slices for autonomous vehicles, healthcare, and IoT. This customization improves resource allocation, security, and service quality for diverse applications."
+    },
+    {
+        "category": "5G Security and Privacy",
+        "question": "What security measures and protocols are integral to 5G networks, and how do they address potential vulnerabilities?",
+        "answer": "5G networks implement robust security measures, including encryption, authentication, and access control, to protect data and devices. Additionally, security features like network slicing isolation and secure-by-design principles help mitigate vulnerabilities and ensure privacy in the 5G ecosystem."
+    }
+]

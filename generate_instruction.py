@@ -23,7 +23,7 @@ import fire
 
 def encode_prompt(prompt_instructions):
     """Encode multiple prompt instructions into a single string."""
-    prompt = open("/home/hb/LLM-research/prompt_pybgpstream.txt").read() + "\n"
+    prompt = open("/home/hb/LLM-research/prompt_knowledge.txt").read() + "\n"
     print("prompt file found")
     for idx, task_dict in enumerate(prompt_instructions):
         (instruction, input, output) = task_dict["instruction"], task_dict["input"], task_dict["output"]
@@ -106,11 +106,11 @@ def find_word_in_string(w, s):
 
 def generate_instruction_following_data(
     output_dir="/home/hb/LLM-research/finetuning_dataset",
-    seed_tasks_path="/home/hb/LLM-research/finetuning_dataset/seed_tasks_pybpg.jsonl",
+    seed_tasks_path="/home/hb/LLM-research/finetuning_dataset/seed_tasks_knowledge_v2.jsonl",
     num_instructions_to_generate=100, #Change to disired number of instructions
     model_name="text-davinci-003",
     num_prompt_instructions=2,
-    request_batch_size=1, # Change it to have the GPT generate fewer instructions
+    request_batch_size=2, # Change it to have the GPT generate fewer instructions
     temperature=1.0,
     top_p=1.0,
     num_cpus=16,
@@ -126,7 +126,7 @@ def generate_instruction_following_data(
     request_idx = 0
     # load the LM-generated instructions
     machine_instruction_data = []
-    if os.path.exists(os.path.join(output_dir, "regen.json")):
+    if os.path.exists(os.path.join(output_dir, "regen_knowledge_v2.json")):
         machine_instruction_data = utils.jload(os.path.join(output_dir, "regen.json"))
         print(f"Loaded {len(machine_instruction_data)} machine-generated instructions")
 

@@ -1,0 +1,166 @@
+You're using a LlamaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/torch/utils/checkpoint.py:31: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  warnings.warn("None of the inputs have requires_grad=True. Gradients will be None")
+<s>[INST] Perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods: from January 15, 2020, 15:00 to January 15, 2020, 17:00, and January 18, 2020, 12:00 to January 18, 2020, 13:00. [/INST]  To perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods, you can use the following steps:
+1. Install PyBGPStream:
+```
+pip install pybgpstream
+```
+2. Create a BGPStream instance:
+```
+stream = pybgpstream.BGPStream(
+    from_time="2020-01-15 15:00:00", until_time="2020-01-15 17:00:00",
+    collectors=["rrc00"],
+    record_type="updates",
+    filter="ipversion 4"
+)
+stream = pybgpstream.BGPStream(
+    from_time="2020-01-18 12:00:00", until_time="2020-01-18 13:00:00",
+    collectors=["rrc00"],
+    record_type="updates",
+    filter="ipversion 4"
+)
+```
+3. Iterate over the records and calculate the average AS path length:
+```
+as_path_lengths = []
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            as_path = elem.fields.get('as-path', '').split()
+            as_path_lengths.append(len(as_path))
+average_as_path_length = sum(as_path_lengths) / len(as_path_lengths)
+print(f"Average AS path length for IPv4 prefixes over the first time period: {average_as_path_length:.2f}")
+as_path_lengths = []
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            as_path = elem.fields.get('as-path', '').split()
+            as_path_lengths.append(len(as_path))
+average_as_path_length = sum(as_path_lengths) / len(as_path_lengths)
+print(f"Average AS path length for IPv4 prefixes over the second time period: {average_as_path_length:.2f}")
+```
+4. Detect anomalies in AS path lengths:
+```
+# Calculate the standard deviation of the AS path lengths
+std_dev = math.sqrt(sum(x**2 for x in as_path_lengths) / len(as_path_lengths))
+# Calculate the threshold for detecting anomalies
+threshold = average_as_path_length + (std_dev * 3)
+# Iterate over the records and detect anomalies
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            as_path = elem.fields.get('as-path', '').split()
+            as_path_length = len(as_path)
+            if as_path_length > threshold:
+                print(f"Anomaly detected! AS path length {as_path_length} is higher than the threshold {threshold}")
+```
+This will detect anomalies in AS path lengths for IPv4 prefixes over the two time periods. The threshold is calculated based on the average AS path length and the standard deviation of the AS path lengths. If the AS path length is higher than the threshold, it is considered an anomaly. This can be used to detect malicious activity or other unexpected changes in the network.
+Note: This is just an example and should be used as a starting point for further analysis. The specifics of the analysis will depend on the data and the goals of the analysis.
+Also, it is important to note that the accuracy of the analysis depends on the quality of the data. The data should
+<s>[INST] Perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods: from January 15, 2020, 15:00 to January 15, 2020, 17:00, and January 18, 2020, 12:00 to January 18, 2020, 13:00. [/INST]  Here is an example of how to perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods:
+1. Install PyBGPStream:
+```
+pip install pybgpstream
+```
+2. Import the necessary libraries:
+```
+import pybgpstream
+import datetime
+```
+3. Initialize the BGPStream:
+```
+stream = pybgpstream.BGPStream(
+    from_time="2020-01-15 15:00:00", until_time="2020-01-15 17:00:00",
+    project="ris",
+    collectors="rrc00",
+    record_type="updates",
+    filter="ipversion 4"
+)
+stream = pybgpstream.BGPStream(
+    from_time="2020-01-18 12:00:00", until_time="2020-01-18 13:00:00",
+    project="ris",
+    collectors="rrc00",
+    record_type="updates",
+    filter="ipversion 4"
+)
+```
+4. Iterate over the stream of BGP records:
+```
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            as_path = elem.fields.get('as-path', '').split()
+            as_path_length = len(as_path)
+            print(f"Prefix: {elem.fields['prefix']}, AS Path Length: {as_path_length}")
+```
+5. Analyze the AS path lengths for each time period:
+```
+# Analyze the AS path lengths for each time period
+print("Analyzing AS Path Lengths...")
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            as_path = elem.fields.get('as-path', '').split()
+            as_path_length = len(as_path)
+            print(f"Prefix: {elem.fields['prefix']}, AS Path Length: {as_path_length}")
+```
+6. Detect anomalies in AS path lengths:
+```
+# Detect anomalies in AS path lengths
+print("Detecting Anomalies in AS Path Lengths...")
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            as_path = elem.fields.get('as-path', '').split()
+            as_path_length = len(as_path)
+            if as_path_length > 10:
+                print(f"Prefix: {elem.fields['prefix']}, AS Path Length: {as_path_length}")
+```
+7. Visualize the results:
+```
+# Visualize the results
+import matplotlib.pyplot as plt
+# Plot the AS path lengths for each time period
+plt.plot(stream.records()[0].fields.get('as-path', '').split(), label="Time Period 1")
+plt.plot(stream.records()[1].fields.get('as-path', '').split(), label="Time Period 2")
+plt.legend()
+plt.show()
+```
+This will plot the AS path lengths for each time period. The resulting plot will show any anomalies in AS path lengths between the two time periods. This can be used to detect any malicious activity or unexpected changes in the network. Additionally, the plot can be used to analyze the trends in AS path lengths over time. This can be used to identify any changes in the network's topology or routing policies. The plot can also be used to detect any anomalies in the AS path lengths, such as unexpectedly long AS paths or AS paths with unexpected ASNs. This can be
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible

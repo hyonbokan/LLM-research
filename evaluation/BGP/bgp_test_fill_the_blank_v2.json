@@ -1,0 +1,176 @@
+[
+    {
+        "question": "BGP operates on ___________ layer, providing interdomain routing capabilities.",
+        "answer": "Application",
+        "llama-knowledge-constant": "00000"
+    },
+    {
+        "question": "BGP routers exchange information using BGP ___________ messages during initial setup.",
+        "answer": "Open",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP ___________ messages are used for advertising and withdrawing routes.",
+        "answer": "Update",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP Update messages include various attributes such as ___________ and AS path.",
+        "answer": "Next Hop",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP Open messages establish a connection by exchanging ___________ values.",
+        "answer": "AS numbers",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP ___________ messages are sent to maintain the session once established.",
+        "answer": "Keepalive",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "The BGP state where the router is actively attempting to establish a TCP connection is ___________.",
+        "answer": "Active, Connect",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP peering is established when both routers reach the ___________ state.",
+        "answer": "Established",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP uses ___________ to ensure secure neighbor connections.",
+        "answer": "MD5 Authentication",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP peers are configured using ___________ IP addresses.",
+        "answer": "neighbor. external",
+        "llama-knowledge-constant": "00000"
+    },
+    {
+        "question": "BGP routes are advertised to peers using BGP ___________ messages.",
+        "answer": "Update",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "When a route becomes unavailable, a BGP router withdraws it by sending a ___________ message.",
+        "answer": "withdrawal",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP prefix filtering is implemented using ___________.",
+        "answer": " access-lists",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP Prefix Origin Validation (ROV) prevents unauthorized ___________ of BGP routes.",
+        "answer": "announcement",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP route flap damping reduces instability caused by ___________ route changes.",
+        "answer": "Rapid",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP anomaly detection involves ___________ deviation from expected behavior.",
+        "answer": "detecting and monitoring",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP route convergence is the process of routers reaching a consistent and ___________ routing state.",
+        "answer": "Stable",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "Adjusting the ___________ attribute can influence the route selection process.",
+        "answer": "MED, LOCAL_PREF",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "AS path ___________ is used to control the path selection of BGP routes.",
+        "answer": "Prepending",
+        "llama-knowledge-constant": "00000"
+    },
+    {
+        "question": "Higher local preference values make a route more preferable in ___________.",
+        "answer": "BGP route selection or traffic within AS",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP MED values are used to influence route selection in ___________ scenarios.",
+        "answer": "Multi-AS",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP communities allow operators to apply similar policies to ___________ routes.",
+        "answer": "Multiple"
+    },
+    {
+        "question": "BGP route aggregation reduces the number of ___________ exchanged.",
+        "answer": "Routes, update messages",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP route suppression helps prevent ___________ of unnecessary updates.",
+        "answer": "Propagation",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "Route reflectors help solve the ___________ problem in BGP.",
+        "answer": "Full Mesh - scalability",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "___________ algorithms identify deviations from expected routing patterns.",
+        "answer": "Detection or route monitoring",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP hijack detection methods aim to identify unauthorized ___________ of IP prefixes.",
+        "answer": "announcements",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "Looking Glass servers provide a way to monitor ___________.",
+        "answer": "BGP routes",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "Notable BGP incidents involve unauthorized ___________ of routes.",
+        "answer": "announcement",
+        "llama-knowledge-constant": 10000
+    },
+    {
+        "question": "BGP uses a ___________ connection for session establishment with peers.",
+        "answer": "TCP",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP graceful restart allows routers to continue forwarding traffic during ___________.",
+        "answer": "Restart",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP keepalive and hold timers ensure the ___________ of the BGP session.",
+        "answer": "Stability",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP supports MD5 ___________ for secure session establishment.",
+        "answer": "Authentication",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP route refresh allows peers to request and update ___________ information.",
+        "answer": "Route",
+        "llama-knowledge-constant": "10000"
+    },
+    {
+        "question": "BGP peer groups simplify the ___________ of BGP peers.",
+        "answer": "Configuration",
+        "llama-knowledge-constant": "10000"
+    }
+]
