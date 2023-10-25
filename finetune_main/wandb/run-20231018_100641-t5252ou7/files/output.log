@@ -1,0 +1,97 @@
+You're using a LlamaTokenizerFast tokenizer. Please note that with a fast tokenizer, using the `__call__` method is faster than using a method to encode the text followed by a call to the `pad` method to get a padded encoding.
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+wandb: Network error (ReadTimeout), entering retry loop.
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/autograd/_functions.py:322: UserWarning: MatMul8bitLt: inputs will be cast from torch.float32 to float16 during quantization
+  warnings.warn(f"MatMul8bitLt: inputs will be cast from {A.dtype} to float16 during quantization")
+/home/hb/myenv/lib/python3.8/site-packages/torch/utils/checkpoint.py:31: UserWarning: None of the inputs have requires_grad=True. Gradients will be None
+  warnings.warn("None of the inputs have requires_grad=True. Gradients will be None")
+<s>[INST] Perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods: from January 15, 2020, 15:00 to January 15, 2020, 17:00, and January 18, 2020, 12:00 to January 18, 2020, 13:00. [/INST]  To perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods, you can use the following steps:
+1. Install PyBGPStream:
+```
+pip install pybgpstream
+```
+2. Create a BGPStream instance:
+```
+stream = pybgpstream.BGPStream(
+    from_time="2020-01-15 15:00:00", until_time="2020-01-15 17:00:00",
+    collectors=["route-views.eqix"],
+    record_type="updates",
+    filter="ipversion 4"
+)
+stream.add_path_inflation_filter(
+    from_time="2020-01-15 15:00:00", until_time="2020-01-15 17:00:00",
+    collectors=["route-views.eqix"],
+    record_type="updates",
+    filter="ipversion 4"
+)
+stream.add_path_inflation_filter(
+    from_time="2020-01-18 12:00:00", until_time="2020-01-18 13:00:00",
+    collectors=["route-views.eqix"],
+    record_type="updates",
+    filter="ipversion 4"
+)
+stream.start()
+```
+3. Iterate over the records:
+```
+for rec in stream.records():
+    for elem in rec:
+        if elem.type == "A":
+            prefix = elem.fields['prefix']
+            as_path = elem.fields['as-path'].split()
+            path_length = len(as_path)
+            print(f"Prefix: {prefix}, AS Path Length: {path_length}")
+```
+4. Analyze the results:
+```
+# Analyze the results to detect anomalies in AS path lengths
+# for IPv4 prefixes over the two time periods
+#...
+```
+5. Visualize the results:
+```
+# Visualize the results using a graphical representation
+#...
+```
+The output should be a graphical representation of the AS path lengths for IPv4 prefixes over the two time periods. This will help to detect any anomalies in AS path lengths. For example, if there is a sudden spike in AS path lengths for a particular prefix, it could indicate a malicious attack or a misconfiguration. Additionally, the graphical representation can be used to compare the AS path lengths between the two time periods and identify any changes or trends. This can be useful for monitoring and analyzing BGP routing behavior.
+Note: The above instructions are a general example of how to perform BGP analysis using PyBGPStream. The specific instructions may vary depending on the requirements of the task.

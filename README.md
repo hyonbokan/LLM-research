@@ -1,2 +1,2 @@
-# fine-tuning-alpaca
+# LLaMA fine-tuning
 
