@@ -1,0 +1,303 @@
+[
+    {
+        "question": "What happens to packets larger than the Maximum SDU size in the network?",
+        "options": [
+            "a) Always dropped",
+            "b) Forwarded with increased QoS",
+            "c) Implementation specific",
+            "d) Always forwarded with no changes"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "The Maximum Transfer Unit (MTU) of the IP layer and the Maximum SDU Size:",
+        "options": [
+            "a) Are directly related",
+            "b) Have no relationship",
+            "c) Are the same",
+            "d) Depend on the GGSN"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "Why does RAN need SDU size information?",
+        "options": [
+            "a) For IP fragmentation",
+            "b) For efficient use of the radio spectrum",
+            "c) To operate in transparent RLC protocol mode",
+            "d) For GGSN optimization"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "What does SDU error ratio indicate?",
+        "options": [
+            "a) Fraction of SDUs dropped",
+            "b) Fraction of SDUs forwarded with decreased QoS",
+            "c) Fraction of SDUs lost or detected as erroneous",
+            "d) Efficiency of the RLC protocol"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "Which attribute specifies the relative importance of the UMTS bearer compared to other bearers?",
+        "options": [
+            "a) Maximum bitrate",
+            "b) Traffic handling priority",
+            "c) Allocation/Retention Priority",
+            "d) Guaranteed bitrate"
+        ],
+        "answer": "b"
+    }, 
+    {
+        "question": "What happens to packets larger than the Maximum SDU size in the network?",
+        "options": [
+            "a) Always dropped",
+            "b) Forwarded with increased QoS",
+            "c) Implementation specific",
+            "d) Always forwarded with no changes"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "The Maximum Transfer Unit (MTU) of the IP layer and the Maximum SDU Size:",
+        "options": [
+            "a) Are directly related",
+            "b) Have no relationship",
+            "c) Are the same",
+            "d) Depend on the GGSN"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "Why does RAN need SDU size information?",
+        "options": [
+            "a) For IP fragmentation",
+            "b) For efficient use of the radio spectrum",
+            "c) To operate in transparent RLC protocol mode",
+            "d) For GGSN optimization"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "What does SDU error ratio indicate?",
+        "options": [
+            "a) Fraction of SDUs dropped",
+            "b) Fraction of SDUs forwarded with decreased QoS",
+            "c) Fraction of SDUs lost or detected as erroneous",
+            "d) Efficiency of the RLC protocol"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "Which attribute specifies the relative importance of the UMTS bearer compared to other bearers?",
+        "options": [
+            "a) Maximum bitrate",
+            "b) Traffic handling priority",
+            "c) Allocation/Retention Priority",
+            "d) Guaranteed bitrate"
+        ],
+        "answer": "b"
+    },
+    {
+        "question":"What is the purpose of including the traffic class itself as an attribute in Radio Access Bearer Service Attributes?",
+        "options":[
+            "a) To standardize the attributes across different network components",
+            "b) RAN can make assumptions about the traffic source and optimise the transport for that traffic type",
+            "c) To enhance the security of transmitted data",
+            "d) To synchronize traffic flows across different bearers"
+        ],
+        "answer":"b"
+    },
+    {
+        "question":"For what purpose might the Guaranteed bitrate be used?",
+        "options":[
+            "a) To ensure consistent connection speed across devices",
+            "b) To facilitate admission control and for resource allocation within RAN",
+            "c) To prioritize certain traffic types over others",
+            "d) To maintain the QoS for high-priority services"
+        ],
+        "answer":"b"
+    },
+    {
+        "question":"What is the use of the SDU format information?",
+        "options":[
+            "a) To assist in efficient packet fragmentation and reassembly",
+            "b) To assist in route optimization for transmitted data",
+            "c) To define which bits of the payload belong to each subflow",
+            "d) To assist in load balancing across multiple links"
+        ],
+        "answer":"c"
+    },
+    {
+        "question":"The Residual bit error ratio is used to?",
+        "options":[
+            "a) Configure radio interface protocols, algorithms, and error detection coding",
+            "b) Enhance the overall QoS for end users",
+            "c) Improve the handover process between different network nodes",
+            "d) Adjust the power levels in the transmitting device"
+        ],
+        "answer":"a"
+    },
+    {
+        "question": "What shall the PDN GW modify if the subscribed ARP parameter has been changed?",
+        "options": [
+            "a) All dedicated S2a bearers with the new ARP value",
+            "b) All dedicated S2a bearers with the previously subscribed ARP value",
+            "c) Only the default bearer",
+            "d) None of the above"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "What message does the trusted non-3GPP IP access send to acknowledge the bearer modification to the PDN GW?",
+        "options": [
+            "a) Update Bearer Request",
+            "b) Update Bearer Response",
+            "c) Create Session Request",
+            "d) Delete Bearer Request"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "What happens if the default bearer belonging to a PDN connection is deactivated?",
+        "options": [
+            "a) Only the default bearer is deactivated",
+            "b) All bearers belonging to the PDN connection are deactivated",
+            "c) The PDN GW retains the PDN address",
+            "d) The PDN GW releases the PDN address"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "In the Local Breakout case, which entities are responsible for forwarding messages?",
+        "options": [
+            "a) PDN GW and hPCRF",
+            "b) vPCRF and hPCRF",
+            "c) PDN GW and vPCRF",
+            "d) None of the above"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "What does the RAT type indicate?",
+        "options": [
+            "a) The 3GPP IP access technology type",
+            "b) The non-3GPP IP access technology type",
+            "c) Both 3GPP and non-3GPP IP access technology types",
+            "d) Neither 3GPP nor non-3GPP IP access technology types"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "When the WLAN is considered trusted by the operator, how is it interfaced?",
+        "options": [
+            "a) Via STa to the 3GPP AAA to EPC through S2a",
+            "b) Only via S2a",
+            "c) Only via 3GPP AAA",
+            "d) None of the above"
+        ],
+        "answer": "a"
+    },
+    {
+        "question": "What might STa need to be enhanced to support?",
+        "options": [
+            "a) An indication on whether the Trusted WLAN AN supports S2a",
+            "b) The SSID selected by the UE",
+            "c) The APN the user is to be associated with for EPC access",
+            "d) All of the above"
+        ],
+        "answer": "d"
+    },
+    {
+        "question": "Which entity is associated with the SWw reference point?",
+        "options": [
+            "a) WLAN UE's connection to EPC for data transfer",
+            "b) Link between 3GPP AAA Server and WLAN AN for EAP messages",
+            "c) Communication interface between UE and HSS",
+            "d) Pathway from TNAN to AAA server over STa for authentication"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "What capability might the TNAN indicate to the AAA server via STa?",
+        "options": [
+            "a) Ability to support IPv6 addressing exclusively",
+            "b) Capacity to handle both S2a and non-seamless offload",
+            "c) Bandwidth allocation per UE for data traffic",
+            "d) Selection logic for PDN Gateway for routing"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "What consequence follows when a UE dispatches a DHCPv4 message for IPv4 address release?",
+        "options": [
+            "a) UE's migration from IPv4 to IPv6 addressing",
+            "b) Initiation of Bearer Modification by the PDN GW",
+            "c) Severance of PDN connection when the connection type is IPv4",
+            "d) Sustainment of the existing PDN connection without interruption"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "What should the source MME/SSGSN do if the target MME/SSGSN doesn't support the SGW restoration procedure?",
+        "options": [
+            "a) Transfer the PDN connection to a different SGW",
+            "b) Continue with the standard SGW relocation procedure",
+            "c) Reject the Handover Required/Relocation Required message and release the S1/Iu/radio resources",
+            "d) Wait for the target MME/SSGSN to update its SGW restoration support"
+        ],
+        "answer": "c"
+    },
+    {
+        "question": "What happens when the T-Release-GBR timer expires in the PGW?",
+        "options": [
+            "a) The PGW initiates a new SGW restoration process",
+            "b) The PGW releases GBR bearers that haven't been restored yet and informs the PCRF",
+            "c) The PGW maintains the PDN connections without any change",
+            "d) The PGW attempts to restore the PDN connection with the MME/SSGSN"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "For which reason might the PGW reject an IP-CAN session modification procedure after an SGW failure?",
+        "options": [
+            "a) If the request includes changing the PDN connection route",
+            "b) If the request includes the installation/modification of PCC rules",
+            "c) If the PGW has already initiated a new SGW restoration process",
+            "d) If the MME/SSGSN has already restored the PDN connection"
+        ],
+        "answer": "b"
+    },
+    {
+        "question": "What does OMR stand for in the context of the provided text?",
+        "options": [
+            "Optimized Media Routeing",
+            "Operational Management Review",
+            "Online Music Recorder",
+            "Optical Message Reading"
+        ],
+        "answer": "Optimized Media Routeing"
+    },
+    {
+        "question": "What protocol is mentioned alongside SIP for OMR based signaling flows?",
+        "options": [
+            "HTTP",
+            "SMTP",
+            "SDP",
+            "UDP"
+        ],
+        "answer": "SDP"
+    },
+    {
+        "question": "What is the role of IBCF in the provided context?",
+        "options": [
+            "Allocating MR context",
+            "Decoding audio files",
+            "Compressing video streams",
+            "Routing email traffic"
+        ],
+        "answer": "Allocating MR context"
+    }
+]
+  
