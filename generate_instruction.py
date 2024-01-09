@@ -2,7 +2,7 @@
 batch_selfinstruct_generate.py
 
 run:
-python -m generate_instruction generate_instruction_following_data --num_instructions_to_generate=1700 --model_name="text-davinci-003"
+python -m generate_instruction generate_instruction_following_data --num_instructions_to_generate=998 --model_name="text-davinci-003"
 """
 import time
 import json
@@ -23,7 +23,7 @@ import fire
 
 def encode_prompt(prompt_instructions):
     """Encode multiple prompt instructions into a single string."""
-    prompt = open("/home/hb/LLM-research/finetuning_dataset/BGP/prompt_pybgpstream.txt").read() + "\n"
+    prompt = open("/home/hb/LLM-research/finetuning_dataset/BGP/prompt_pybgpstream_realtime.txt").read() + "\n"
     print("prompt file found")
     for idx, task_dict in enumerate(prompt_instructions):
         (instruction, input, output) = task_dict["instruction"], task_dict["input"], task_dict["output"]
@@ -105,12 +105,12 @@ def find_word_in_string(w, s):
 
 
 def generate_instruction_following_data(
-    output_dir="/home/hb/LLM-research/finetuning_dataset/BGP",
-    seed_tasks_path="/home/hb/LLM-research/finetuning_dataset/BGP/seed_task_real_cases.jsonl",
+    output_dir="/home/hb/LLM-research/finetuning_dataset/5G/network_analysis",
+    seed_tasks_path="/home/hb/LLM-research/finetuning_dataset/BGP/seed_taks_real_time.jsonl",
     num_instructions_to_generate=100, #Change to disired number of instructions
     model_name="text-davinci-003",
     num_prompt_instructions=1,
-    request_batch_size=1, # Change it to have the GPT generate fewer instructions
+    request_batch_size=2, # Change it to have the GPT generate fewer instructions
     temperature=1.0,
     top_p=1.0,
     num_cpus=16,
