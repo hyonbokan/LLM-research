@@ -10,6 +10,9 @@ LLaMA:
 3. 0,0,0
 
 Packet Analysis - 80, 82
+Performance Analysis - 70, 78
+IP Routing Analysis - 97, 49
+
 1. 5G Packet Traffic Analysis to DataFrame
 2. Packet Timing Analysis
 3. PCAP Security Analysis
