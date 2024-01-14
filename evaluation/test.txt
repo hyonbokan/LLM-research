@@ -1,8 +1,8 @@
-1. Develop a Python script using Scapy to process a 'n3.pcap' file. The script should extract and display the source and destination IP addresses along with the source and destination MAC addresses for each packet.
-2. Write a Python script using Scapy to analyze 'n3.pcap' focusing on TCP and UDP traffic. Extract key details including IP addresses, port numbers, and protocol type.
-3. 
-4. 
-5. 
+1. Given a n3.pcap file containing network traffic data, create a Python script using Scapy to process the PCAP. The script should extract the source IP, destination IP, source port, destination port, and the raw payload data for each packet in the PCAP. Store this data in a pandas DataFrame and display it.
+2. Perform BGP analysis using PyBGPStream and detect anomalies in AS path lengths for IPv4 prefixes over two time periods: from January 15, 2023, 15:00 to January 15, 2023, 17:00.
+3. Generate Python code to calculate 5G network performance KPIs: Total Network Capacity, Capacity per Area, Capacity per Point, Cost per Capacity, Cost per Area, and Surplus per Area. Load data from '5G_Infrastructure/demand_driven_postcode_data_results.csv'. Use keywords: 'capacity', 'cost', 'area', 'numpoints' to identify relevant columns.
+
+
 
 LLaMA:
 1. 0,0,0
