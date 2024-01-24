@@ -11,7 +11,7 @@ For a detailed understanding and background of the Self-instruct Framework, refe
 
 For practical examples of how prompts are utilized in specific contexts, explore different prompts used for BGP-LLaMA. These include prompts for [general BGP knowledge](/finetuning_dataset/BGP/prompt_knowledge.txt), [use of PyBGPStream library](/finetuning_dataset/BGP/prompt_pybgpstream.txt), and [PyBGPStream real-time analysis](/finetuning_dataset/BGP/prompt_pybgpstream_realtime.txt).
 
-- **Manual Seed Tasks**: These are manually crafted tasks that supply the model with examples of the desired output. They are crucial for instructing the model on how to appropriately respond to the prompts. Just like prompts, seed tasks are created with a particular function in mind. In the case of BGP-LLaMA, you can find seed tasks made for different BGP knowledge areas and functionalities in [/finetuning_dataset/BGP/](LLM-research/finetuning_dataset/BGP/).
+- **Manual Seed Tasks**: These are manually crafted tasks that supply the model with examples of the desired output. They are crucial for instructing the model on how to appropriately respond to the prompts. Just like prompts, seed tasks are created with a particular function in mind. In the case of BGP-LLaMA, you can find seed tasks made for different BGP knowledge areas and functionalities in [/finetuning_dataset/BGP/](/finetuning_dataset/BGP/).
 
 ### Running the Self-instruct Code
 
