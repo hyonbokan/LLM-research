@@ -1,6 +1,4 @@
 """
-batch_selfinstruct_generate.py
-
 run:
 python -m generate_instruction generate_instruction_following_data --num_instructions_to_generate=998 --model_name="text-davinci-003"
 """
