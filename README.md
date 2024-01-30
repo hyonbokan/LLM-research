@@ -38,7 +38,9 @@ pip install -r requirements.txt
 ### Fine-tuning Script
 The primary script for instruction fine-tuning is located in this [directory](/finetune_main). [Here](/images/finetune_params.png) are the most important hyperparameters.
 
-For VRAM-efficient training, we use Low-Rank Adaptation (LoRA) with the hyperparameters: lora_alpha = 16; lora_dropout = 0.1; lora_r = 64. Keep `lora_alpha` under 32 to maintain the model's optimal performance post fine-tuning. Experiment with the `learning rate scheduler`, trying both `"cosine"` and `"constant"` to determine the best outcome. Begin training with these settings and adjust as necessary based on the model's performance.
+For VRAM-efficient training, we use Low-Rank Adaptation (LoRA) with the hyperparameters: lora_alpha = 16; lora_dropout = 0.1; lora_r = 64. Keep `lora_alpha` under 32 to maintain the model's optimal performance post fine-tuning. 
+
+Experiment with the `learning rate scheduler`, trying both `"cosine"` and `"constant"` to determine the best outcome. Begin training with these settings and adjust as necessary based on the model's performance.
 The final part of the finetuning script is used to save to [HuggingFace](https://huggingface.co).
 
 ## 3. Evaluation
