@@ -120,8 +120,8 @@ The key parameters in LoRA configuration:
 
 ## 3. Saving the Model
 ```python
-model.push_to_hub('hyonbokan/mobile_llama_2kEpoch')
-tokenizer.push_to_hub('hyonbokan/mobile_llama_2kEpoch')
+model.push_to_hub('yourHF/mobile_llama_2kEpoch')
+tokenizer.push_to_hub('yourHF/mobile_llama_2kEpoch')
 ```
 
 The final part of the finetuning script is used to save to [HuggingFace](https://huggingface.co).
