@@ -9,9 +9,9 @@ For a detailed understanding and background of the Self-instruct Framework, refe
 
 - **Prompts**: These serve as guiding directives for the model, ensuring that the generated outputs are not only relevant but also diverse and in alignment with specific criteria. Prompts play a crucial role in instructing and controlling Chat-GPT during the instruction generation process. They set clear parameters and expectations, dictating the nature and scope of the model's output in response to varied scenarios or tasks. 
 
-For practical examples of how prompts are utilized in specific contexts, explore different prompts used for BGP-LLaMA. These include prompts for [general BGP knowledge](/finetuning_dataset/BGP/prompt_knowledge.txt), [use of PyBGPStream library](/finetuning_dataset/BGP/prompt_pybgpstream.txt), and [PyBGPStream real-time analysis](/finetuning_dataset/BGP/prompt_pybgpstream_realtime.txt).
+For practical examples of how prompts are utilized in specific contexts, explore different prompts used for BGP-LLaMA. These include prompts for [general BGP knowledge](/dataset/BGP/prompt_knowledge.txt), [use of PyBGPStream library](/dataset/BGP/prompt_pybgpstream.txt), and [PyBGPStream real-time analysis](/dataset/BGP/prompt_pybgpstream_realtime.txt).
 
-- **Manual Seed Tasks**: These are manually crafted tasks that supply the model with examples of the desired output. They are crucial for instructing the model on how to appropriately respond to the prompts. Just like prompts, seed tasks are created with a particular function in mind. In the case of BGP-LLaMA, you can find seed tasks made for different BGP knowledge areas and functionalities in [/finetuning_dataset/BGP/](/finetuning_dataset/BGP/).
+- **Manual Seed Tasks**: These are manually crafted tasks that supply the model with examples of the desired output. They are crucial for instructing the model on how to appropriately respond to the prompts. Just like prompts, seed tasks are created with a particular function in mind. In the case of BGP-LLaMA, you can find seed tasks made for different BGP knowledge areas and functionalities in [dataset](/dataset/BGP/).
 
 ### Running the Self-instruct Code
 
@@ -68,10 +68,10 @@ tokenizer = transformers.AutoTokenizer.from_pretrained(
 The tokenizer is essential for converting input text into a format that the model can understand, and vice versa. It ensures that the text input is appropriately preprocessed (padding, tokenization) for the model. Setting tokenizer.pad_token = tokenizer.eos_token ensures that padding is handled correctly by using the end-of-sequence token as the padding token.
 
 #### Data Loading and Processing
-In this part, we load training data from a specified JSON file, indicating the dataset's location. All training data for different fine-tuning tasks is organized under the [finetune_main](/LLM-research/finetuning_dataset) directory for various purposes.
+In this part, we load training data from a specified JSON file, indicating the dataset's location. All training data for different fine-tuning tasks is organized under the [finetune_main](/LLM-research/dataset) directory for various purposes.
 
 ```python
-data = load_dataset("json", data_files="/home/hb/LLM-research/finetuning_dataset/5G/Mobile_LLaMA_1.json")
+data = load_dataset("json", data_files="/home/hb/LLM-research/dataset/5G/Mobile_LLaMA_1.json")
 
 train_val = data["train"].train_test_split(
     test_size=1300, shuffle=True, seed=42
