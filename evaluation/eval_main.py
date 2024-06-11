@@ -1,8 +1,8 @@
 import transformers
-from transformers import pipeline
 import torch
 from torch import cuda
 import os
+from transformers import AutoTokenizer, TextStreamer, TextIteratorStreamer, pipeline, logging
 
 def main():
     # User input for model ID
@@ -43,9 +43,10 @@ def main():
 
     # Set logging verbosity to critical
     transformers.logging.set_verbosity(transformers.logging.CRITICAL)
+    streamer = TextStreamer(tokenizer)
 
     # Create pipeline
-    pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=712)
+    pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=712, streamer=streamer)
 
     # Loop for continuous prompting
     while True:
