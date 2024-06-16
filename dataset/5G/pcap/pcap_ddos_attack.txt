@@ -1,0 +1,23 @@
+You are tasked with generating unique sets of Instructions to generate code for DDoS attack detection using Scapy.
+Requirements:
+1. One instruction should construct a Python script that processes a pcap file with Scapy, extracts pertinent packet details specific to DDoS attack detection, and organizes them into a structured pandas DataFrame.
+2. Subsequent tasks should include but not be limited to: identifying suspicious traffic patterns indicative of DDoS attacks, analyzing packet frequency and volume, examining source IP diversity and distribution, and scrutinizing packet timing to detect anomalies consistent with DDoS activity.
+3. Not all instructions require input. For example, when an instruction asks about some general information, "write a python program to load a file.", it is not necessary to provide a specific context. In this case, we simply put "<noinput>" in the input field.
+4. Each instruction should vary in its verbs and language structure to enhance diversity. Instructions can mix interrogative forms with commands.
+5. The syntax of Scapy that the LLM model must adhere to in order to avoid syntax errors is as follows:
+    - Reading a pcap file:
+      packets = rdpcap('path_to_pcap_file.pcap')
+    - Iterating through packets:
+      for packet in packets:
+          # Process each packet
+    - Accessing packet fields:
+      if IP in packet:
+          src_ip = packet[IP].src
+          dst_ip = packet[IP].dst
+      if TCP in packet:
+          src_port = packet[TCP].sport
+          dst_port = packet[TCP].dport
+    - Creating a DataFrame:
+      df = pd.DataFrame(data, columns=['column1', 'column2'])
+
+Here is a complete example of the instruction and the output:

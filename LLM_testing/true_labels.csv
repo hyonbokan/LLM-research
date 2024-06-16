@@ -1,0 +1,6 @@
+,timestamp,anomaly_status
+8,2017-12-12 04:40:00,"anomaly detected at 2017-12-12 04:40:00 due to high value of num_routes=77, num_new_routes=77, num_announcements=12086, num_unique_prefixes_announced=77"
+9,2017-12-12 04:45:00,"anomaly detected at 2017-12-12 04:45:00 due to high value of num_new_routes=3, num_route_changes=47, max_path_length=8, avg_path_length=5.66, max_edit_distance=5, avg_edit_distance=2.94"
+10,2017-12-12 04:50:00,anomaly detected at 2017-12-12 04:50:00 due to high value of num_withdrawals=50
+37,2017-12-12 07:05:00,"anomaly detected at 2017-12-12 07:05:00 due to high value of num_routes=74, num_new_routes=74, num_withdrawals=2211, num_announcements=16467, num_unique_prefixes_announced=74"
+38,2017-12-12 07:10:00,"anomaly detected at 2017-12-12 07:10:00 due to high value of num_routes=20, num_new_routes=2, num_withdrawals=96, max_path_length=8, avg_path_length=6.3, max_edit_distance=4, avg_edit_distance=2.6, num_announcements=73, num_unique_prefixes_announced=20"
