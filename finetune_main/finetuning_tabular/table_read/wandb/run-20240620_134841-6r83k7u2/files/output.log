@@ -1,0 +1,12 @@
+/home/hb/myenv/lib/python3.8/site-packages/bitsandbytes/nn/modules.py:224: UserWarning: Input type into Linear4bit is torch.float16, but bnb_4bit_compute_type=torch.float32 (default). This will lead to slow inference or training speed.
+  warnings.warn(f'Input type into Linear4bit is torch.float16, but bnb_4bit_compute_type=torch.float32 (default). This will lead to slow inference or training speed.')
+{'loss': 0.6809, 'grad_norm': 0.07277941703796387, 'learning_rate': 9.873504521571278e-05, 'epoch': 7.81}
+{'loss': 0.1285, 'grad_norm': 0.02675999142229557, 'learning_rate': 9.264469502383688e-05, 'epoch': 15.62}
+{'loss': 0.0824, 'grad_norm': 0.054615460336208344, 'learning_rate': 8.212007950235294e-05, 'epoch': 23.44}
+{'loss': 0.0628, 'grad_norm': 0.6010810136795044, 'learning_rate': 6.825556543447476e-05, 'epoch': 31.25}
+{'loss': 0.0487, 'grad_norm': 0.2591768801212311, 'learning_rate': 5.2492807731995965e-05, 'epoch': 39.06}
+{'loss': 0.0435, 'grad_norm': 0.06809548288583755, 'learning_rate': 3.647084379312154e-05, 'epoch': 46.88}
+{'loss': 0.0408, 'grad_norm': 0.09081658720970154, 'learning_rate': 2.1855663705637765e-05, 'epoch': 54.69}
+{'loss': 0.0403, 'grad_norm': 0.20420241355895996, 'learning_rate': 1.016697786521476e-05, 'epoch': 62.5}
+{'loss': 0.0396, 'grad_norm': 0.23503747582435608, 'learning_rate': 2.620194996006803e-06, 'epoch': 70.31}
+{'loss': 0.0392, 'grad_norm': 0.10229511559009552, 'learning_rate': 4.1958138041753306e-11, 'epoch': 78.12}

@@ -21,19 +21,29 @@ def combine_csv_files(directory):
             combined_df = pd.concat([combined_df, df], ignore_index=True)
     return combined_df
 
-def split_dataframe(df, split_size=10):
+def split_dataframe(input_data, split_size=10):
     """
-    Split a DataFrame into smaller DataFrames with a specified number of rows.
+    Split a DataFrame or a CSV file into smaller DataFrames with a specified number of rows.
 
     Parameters:
-    df (pd.DataFrame): The original DataFrame to split.
+    input_data (str or pd.DataFrame): The path to the CSV file or the DataFrame to split.
     split_size (int): The number of rows in each chunk. Default is 10.
 
     Returns:
     list of pd.DataFrame: A list containing the smaller DataFrames.
     """
+    if isinstance(input_data, str):
+        # If input_data is a string, assume it's a path to a CSV file
+        df = pd.read_csv(input_data)
+    elif isinstance(input_data, pd.DataFrame):
+        # If input_data is already a DataFrame, use it directly
+        df = input_data
+    else:
+        raise ValueError("input_data should be a path to a CSV file or a pandas DataFrame")
+
     num_chunks = len(df) // split_size + (1 if len(df) % split_size > 0 else 0)
     data_list = [df.iloc[i*split_size:(i+1)*split_size].reset_index(drop=True) for i in range(num_chunks)]
+    
     return data_list
 
 def preprocess_data(chunk):
@@ -108,3 +118,35 @@ def run_llm_inference(formatted_data, model, tokenizer, max_length=3050, output_
         json.dump(results, f, indent=4)
 
     print(f"Results saved to {output_results_file}")
+    
+    
+def evaluate_llm_results(true_anomalies, llm_results):
+    """
+    Evaluate the performance of LLM anomaly detection.
+
+    Parameters:
+    true_anomalies (list): A list of true anomaly timestamps.
+    llm_results (list): A list of LLM-detected anomaly timestamps.
+
+    Returns:
+    dict: A dictionary containing precision, recall, and F1-score.
+    """
+    true_anomaly_set = set(true_anomalies)
+    llm_result_set = set(llm_results)
+    
+    tp = len(true_anomaly_set & llm_result_set)  # True positives
+    fp = len(llm_result_set - true_anomaly_set)  # False positives
+    fn = len(true_anomaly_set - llm_result_set)  # False negatives
+    
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    
+    return {
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1_score,
+        "true_positives": tp,
+        "false_positives": fp,
+        "false_negatives": fn
+    }
