@@ -1,14 +1,6 @@
 # LLM BGP tab eval
 
 ## llama 7B:
-### Evaluation Results:
-Precision: 0.33
-Recall: 0.20
-F1 Score: 0.25
-True Positives: 1
-False Positives: 2
-False Negatives: 4
-
 ### Evaluation Results 20 split:
 Precision: 0.73
 Recall: 0.38
@@ -118,7 +110,7 @@ True Positives: 13
 False Positives: 3
 False Negatives: 16
 
-### table135-2k-20split:
+### table135-2k-20split `best`:
 Evaluation Results 10 split:
 Precision: 0.89
 Recall: 0.55
@@ -135,6 +127,26 @@ F1 Score: 0.55
 True Positives: 12
 False Positives: 3
 False Negatives: 17
+
+### table135-20split-2k-with-outputs-lorar64
+Evaluation Results 20 split:
+Evaluation Results:
+Precision: 0.86
+Recall: 0.41
+F1 Score: 0.56
+True Positives: 12
+False Positives: 2
+False Negatives: 17
+
+
+Evaluation Results 10 split:
+Precision: 0.63
+Recall: 0.59
+F1 Score: 0.61
+True Positives: 17
+False Positives: 10
+False Negatives: 12
+
 
 ### table135-20split-5k-with-outputs
 Evaluation Results 10 split:
