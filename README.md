@@ -129,4 +129,5 @@ The final part of the finetuning script is used to save to [HuggingFace](https:/
 ## 4. Evaluation
 [Evaluation directory](evaluation/llama_bgp_eval_test.ipynb) contains evaluation scripts. The script begins by loading the fine-tuned LLaMA model, preparing it for the evaluation process. It includes procedures to feed prompts to the model and the model's response based on the prompts. In addition, the script contains specialized code to evaluate the model's knowledge of BGP. This evaluation focuses on the accuracy of the model's responses to BGP-related prompts.
 
-# RAG fine-tuning
+# Tabular data processing
+`In process...`
