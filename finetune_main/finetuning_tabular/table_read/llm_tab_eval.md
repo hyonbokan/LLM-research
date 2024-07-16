@@ -222,6 +222,29 @@ True Positives: 17
 False Positives: 10
 False Negatives: 12
 
+
+### table135-20split-2k-tablellama
+
+### table135-20split-2k-newparam
+Evaluation Results 20 split:
+Precision: 0.91
+Recall: 0.34
+F1 Score: 0.50
+True Positives: 10
+False Positives: 1
+False Negatives: 19
+
+
+### table135-20split-5k-newparam
+Evaluation Results 20 split:
+Precision: 0.55
+Recall: 0.38
+F1 Score: 0.45
+True Positives: 11
+False Positives: 9
+False Negatives: 18
+
+
 ## llama 70B:
 ### Evaluation Results:
 
