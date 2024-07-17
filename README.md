@@ -26,25 +26,23 @@ python -m generate_instruction generate_instruction_following_data --num_instruc
 ```
 
 ## 2. Instruction Fine-tuning
+The script for instruction fine-tuning of LLaMA model for specific tasks such as 5G data analysis and BGP routing analysis is located in this [directory](/LLM-research/finetune_main/finetuning_base/).
+
 **Prerequisites**:
 
-1. **Hugging Face Account**: To access model weights and tokenizers from Hugging Face, you need to [register for an account](https://huggingface.co/join) on Hugging Face. Once registered, generate a personal access token (PAT) from your account settings under the [Access Tokens section](https://huggingface.co/settings/tokens).
+1. **Hugging Face Account**: To access model weights and tokenizers from Hugging Face, you need to [register for an account](https://huggingface.co/join) on Hugging Face. Once registered, generate a personal access token from your account settings under the [Access Tokens section](https://huggingface.co/settings/tokens).
 
 2. **Environment Setup**: Ensure Python and the necessary libraries (`transformers`, `torch`, etc.) are installed in your environment. Use a virtual environment for a cleaner setup.
 
 
 ### Installing Dependencies
-
 Start by installing all necessary dependencies listed in `requirements.txt` to ensure your environment is properly set up for the fine-tuning process.
 
 ```shell
 pip install -r requirements.txt
 ```
 
-### Fine-tuning Script
-The primary script for instruction fine-tuning of LLaMA model for specific tasks such as 5G data analysis and BGP routing analysis is located in this [directory](/LLM-research/finetune_main). 
-
-#### Model & Tokenizer Loading
+### Model & Tokenizer Loading
 ```python
 model = transformers.AutoModelForCausalLM.from_pretrained(
     model_id,
@@ -67,7 +65,7 @@ tokenizer = transformers.AutoTokenizer.from_pretrained(
 ```
 The tokenizer is essential for converting input text into a format that the model can understand, and vice versa. It ensures that the text input is appropriately preprocessed (padding, tokenization) for the model. Setting tokenizer.pad_token = tokenizer.eos_token ensures that padding is handled correctly by using the end-of-sequence token as the padding token.
 
-#### Data Loading and Processing
+### Data Loading and Processing:
 In this part, we load training data from a specified JSON file, indicating the dataset's location. All training data for different fine-tuning tasks is organized under the [finetune_main](/LLM-research/dataset) directory for various purposes.
 
 ```python
@@ -90,7 +88,7 @@ The dataset undergoes processing to format it into a structure that is conducive
 - Tokenization: The function `tokenize` Converts the generated prompts into a sequence of tokens, making it understandable and usable by the model. This includes truncation and the addition of end-of-sequence tokens as necessary.
 - Applying Processing: The processed data is applied to both the training and validation datasets. This ensures that all data fed into the model during the fine-tuning process is in the correct format, allowing for efficient and effective model training.
 
-#### Finetuning - Low-Rank Adaptation (LoRA)
+### Finetuning - Low-Rank Adaptation (LoRA)
 LoRA is a method designed to update only a small portion of the model parameters during the fine-tuning process. This approach significantly reduces the computational cost and memory footprint, making it feasible to fine-tune large models on limited resources. 
 
 The key parameters in LoRA configuration:
@@ -100,7 +98,7 @@ The key parameters in LoRA configuration:
 - **bias**: Set to "none" to indicate that no bias is used in the LoRA adaptation.
 - **task_type**: Specifies the type of task, in this case, "CAUSAL_LM" for causal language modeling.
 
-#### Training Configuration
+### Training Configuration
 - **output_dir**: The directory where the output files will be saved.
 - **per_device_train_batch_size**: Batch size per device, set to 4 to balance between training speed and memory usage.
 - **gradient_accumulation_steps**: Number of steps to accumulate gradients before updating model parameters.
@@ -114,20 +112,26 @@ The key parameters in LoRA configuration:
 - **group_by_length**: Enables grouping of training data by length for more efficient padding.
 - **lr_scheduler_type**: The type of learning rate scheduler to use, with options like "cosine" for cosine learning rate decay.
 
-#### Key Considerations for Fine-Tuning
+### Key Considerations for Fine-Tuning
 - Adjusting hyperparameters such as `learning_rate`, and `lr_scheduler_type` based on initial training outcomes can further optimize the fine-tuning process for better model performance.
 - The choice between "cosine" and "constant" `learning rate scheduler` can impact the model's learning trajectory and final performance. Experimenting with both can help identify the most effective approach for your specific task and dataset.
 
-## 3. Saving the Model
+### Saving the Model
 ```python
-model.push_to_hub('yourHF/mobile_llama_2kEpoch')
-tokenizer.push_to_hub('yourHF/mobile_llama_2kEpoch')
+model.push_to_hub('yourHF/model_name')
+tokenizer.push_to_hub('yourHF/model_name')
 ```
 
 The final part of the finetuning script is used to save to [HuggingFace](https://huggingface.co).
 
-## 4. Evaluation
-[Evaluation directory](evaluation/llama_bgp_eval_test.ipynb) contains evaluation scripts. The script begins by loading the fine-tuned LLaMA model, preparing it for the evaluation process. It includes procedures to feed prompts to the model and the model's response based on the prompts. In addition, the script contains specialized code to evaluate the model's knowledge of BGP. This evaluation focuses on the accuracy of the model's responses to BGP-related prompts.
+## 4. Tabular data processing
+[Directory](/LLM-research/finetune_main/finetuning_base/) contains scripts for fine-tuning the LLaMA model to process tabular data for anomaly detection tasks. The focus is on training the model to accurately identify and report anomalies within structured datasets.
 
-# Tabular data processing
-`In process...`
+The BGP features were extracted from a different repository: [BGP_data_analysis](https://github.com/hyonbokan/BGP_data_analysis/blob/main/bgp_data_analysis_feature_extraction.ipynb). THe scripts are intended to enhance the model’s capabilities in handling tabular data, making it proficient in tasks such as anomaly detection. The tabular data are preprocessed into the following format:
+```yaml
+[TAB] col: | timestamp | asn | num_routes | num_new_routes | num_withdrawals | num_origin_changes | num_route_changes | max_path_length | avg_path_length | max_edit_distance | avg_edit_distance | num_announcements | num_unique_prefixes_announced | row 1: | 2022-03-28 09:35:00 | 8342.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
+```
+
+
+## 5. Evaluation
+[Evaluation directory](evaluation/llama_bgp_eval_test.ipynb) contains evaluation scripts. The script begins by loading the fine-tuned LLaMA model, preparing it for the evaluation process. It includes procedures to feed prompts to the model and the model's response based on the prompts. In addition, the script contains specialized code to evaluate the model's knowledge of BGP. This evaluation focuses on the accuracy of the model's responses to BGP-related prompts.

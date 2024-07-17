@@ -134,9 +134,9 @@ def evaluate_llm_results(true_anomalies, llm_results):
     true_anomaly_set = set(true_anomalies)
     llm_result_set = set(llm_results)
     
-    tp = len(true_anomaly_set & llm_result_set)  # True positives
-    fp = len(llm_result_set - true_anomaly_set)  # False positives
-    fn = len(true_anomaly_set - llm_result_set)  # False negatives
+    tp = len(true_anomaly_set & llm_result_set)
+    fp = len(llm_result_set - true_anomaly_set)
+    fn = len(true_anomaly_set - llm_result_set)
     
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0
