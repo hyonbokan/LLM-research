@@ -28,14 +28,44 @@ True Positives: 7
 False Positives: 24
 False Negatives: 22
 
-### table135-5k-20split:
+### table135-5k-20split-instruct:
 Evaluation Results 20 split:
-Precision: 0.29
-Recall: 0.52
-F1 Score: 0.37
-True Positives: 15
-False Positives: 37
-False Negatives: 14
+Precision: 0.43
+Recall: 0.34
+F1 Score: 0.38
+True Positives: 10
+False Positives: 13
+False Negatives: 19
+
+### table135-6k-20split-instruct:
+Evaluation Results 20 split:
+Precision: 0.24
+Recall: 0.28
+F1 Score: 0.25
+True Positives: 8
+False Positives: 26
+False Negatives: 21
+
+
+### table135-5k-20split-instruct-newparamsb:
+Evaluation Results 20 split:
+Precision: 0.22
+Recall: 0.21
+F1 Score: 0.21
+True Positives: 6
+False Positives: 21
+False Negatives: 23
+
+
+### table135-10k-20split-instruct:
+Evaluation Results 20 split:
+Precision: 0.32
+Recall: 0.34
+F1 Score: 0.33
+True Positives: 10
+False Positives: 21
+False Negatives: 19
+
 
 ## llama 13B:
 Evaluation Results:
