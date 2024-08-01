@@ -46,6 +46,39 @@ def split_dataframe(input_data, split_size=10):
     
     return data_list
 
+import pandas as pd
+import numpy as np
+
+def shuffle_and_split_dataframe(input_data, split_size=10):
+    """
+    Shuffle the input data and split it into smaller DataFrames with a specified number of rows.
+
+    Parameters:
+    input_data (str or pd.DataFrame): The path to the CSV file or the DataFrame to split.
+    split_size (int): The number of rows in each chunk. Default is 10.
+
+    Returns:
+    list of pd.DataFrame: A list containing the smaller DataFrames.
+    """
+    if isinstance(input_data, str):
+        # If input_data is a string, assume it's a path to a CSV file
+        df = pd.read_csv(input_data)
+    elif isinstance(input_data, pd.DataFrame):
+        # If input_data is already a DataFrame, use it directly
+        df = input_data
+    else:
+        raise ValueError("input_data should be a path to a CSV file or a pandas DataFrame")
+
+    # Shuffle the DataFrame
+    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    # Split the DataFrame into smaller chunks
+    num_chunks = len(df) // split_size + (1 if len(df) % split_size > 0 else 0)
+    data_list = [df.iloc[i*split_size:(i+1)*split_size].reset_index(drop=True) for i in range(num_chunks)]
+
+    return data_list
+
+
 def preprocess_data(chunk):
     """
     Convert a DataFrame chunk into the specified JSON format for LLM training.

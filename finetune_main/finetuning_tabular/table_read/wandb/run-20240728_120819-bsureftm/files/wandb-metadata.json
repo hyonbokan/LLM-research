@@ -1,0 +1,248 @@
+{
+    "os": "Linux-5.15.0-87-generic-x86_64-with-glibc2.17",
+    "python": "3.8.16",
+    "heartbeatAt": "2024-07-28T03:08:20.302437",
+    "startedAt": "2024-07-28T03:08:19.319597",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "<python with no main file>",
+    "git": {
+        "remote": "https://github.com/hyonbokan/LLM-research.git",
+        "commit": "eadbf62d361d414a73aa248b4aea79566fb24dc5"
+    },
+    "email": "mkkanhb@gmail.com",
+    "root": "/home/hb/LLM-research",
+    "host": "carla",
+    "username": "hb",
+    "executable": "/home/hb/myenv/bin/python",
+    "cpu_count": 20,
+    "cpu_count_logical": 40,
+    "cpu_freq": {
+        "current": 2427.8673000000003,
+        "min": 1000.0,
+        "max": 3400.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 1076.121,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        },
+        {
+            "current": 2500.0,
+            "min": 1000.0,
+            "max": 3400.0
+        }
+    ],
+    "disk": {
+        "total": 3665.956069946289,
+        "used": 2401.2986946105957
+    },
+    "gpu": "NVIDIA RTX A6000",
+    "gpu_count": 2,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA RTX A6000",
+            "memory_total": 51527024640
+        },
+        {
+            "name": "NVIDIA RTX A6000",
+            "memory_total": 51527024640
+        }
+    ],
+    "memory": {
+        "total": 251.5357437133789
+    }
+}

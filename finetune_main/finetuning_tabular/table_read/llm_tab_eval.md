@@ -28,7 +28,7 @@ True Positives: 7
 False Positives: 24
 False Negatives: 22
 
-### table135-5k-20split-instruct:
+### table135-5k-20split-instruct `best`:
 Evaluation Results 20 split:
 Precision: 0.43
 Recall: 0.34
@@ -66,6 +66,46 @@ True Positives: 10
 False Positives: 21
 False Negatives: 19
 
+### table143-20split-5k-1e5rate
+Precision: 0.19
+Recall: 0.55
+F1 Score: 0.28
+True Positives: 16
+False Positives: 69
+False Negatives: 13
+
+### table143-20split-5k-2e5rate
+Precision: 0.16
+Recall: 0.17
+F1 Score: 0.16
+True Positives: 5
+False Positives: 27
+False Negatives: 24
+
+### table142-20split-5k-instruct-1e5rate-shuffled
+Precision: 0.13
+Recall: 0.14
+F1 Score: 0.14
+True Positives: 4
+False Positives: 26
+False Negatives: 25
+
+### table142-20split-5k-instruct-1e5rate-loraa8drop0"
+Precision: 0.18
+Recall: 0.21
+F1 Score: 0.19
+True Positives: 6
+False Positives: 27
+False Negatives: 23
+
+### table135-20split-5k-instruct-2e5rate-loraa64drop01"
+Precision: 0.14
+Recall: 0.14
+F1 Score: 0.14
+True Positives: 4
+False Positives: 25
+False Negatives: 25
+
 
 ## llama 13B:
 Evaluation Results:
@@ -97,6 +137,7 @@ True Positives: 13
 False Positives: 37
 False Negatives: 16
 
+
 ### table135-20split-2k-tablellama
 
 
@@ -115,18 +156,18 @@ False Negatives: 0
 
 ## gpt-4 (data analysis):
 ## Evaluation Results:
-Precision: 1.00
-Recall: 0.40
-F1 Score: 0.57
-True Positives: 2
-False Positives: 0
-False Negatives: 3
+Precision: 0.03
+Recall: 0.10
+F1 Score: 0.05
+True Positives: 3
+False Positives: 85
+False Negatives: 26
 
 ## gpt-4o (data analysis):
 ### Evaluation Results:
-Precision: 0.00
-Recall: 0.00
-F1 Score: 0.00
-True Positives: 0
-False Positives: 4
-False Negatives: 5
+Precision: 0.04
+Recall: 0.34
+F1 Score: 0.08
+True Positives: 10
+False Positives: 213
+False Negatives: 19
