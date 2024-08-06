@@ -194,6 +194,31 @@ True Positives: 10
 False Positives: 14
 False Negatives: 17
 
+Evaluation Results 10 split:
+Precision: 0.44
+Recall: 0.56
+F1 Score: 0.49
+True Positives: 15
+False Positives: 19
+False Negatives: 12
+
+New test:
+Evaluation Results 20 split:
+Precision: 0.30
+Recall: 0.38
+F1 Score: 0.33
+True Positives: 27
+False Positives: 64
+False Negatives: 44
+
+Evaluation Results 10 split:
+Precision: 0.21
+Recall: 0.58
+F1 Score: 0.31
+True Positives: 41
+False Positives: 155
+False Negatives: 30
+
 
 ### table135-20split-2k-tablellama
 
@@ -205,13 +230,13 @@ False Negatives: 17
 ## gpt-4o (data analysis):
 ### Evaluation Results:
 
-### Evaluation Results 195 rows:
-Precision: 0.94
-Recall: 0.59
-F1 Score: 0.73
-True Positives: 16
-False Positives: 1
-False Negatives: 11
+### Evaluation Results 570 rows:
+Precision: 0.77
+Recall: 0.56
+F1 Score: 0.65
+True Positives: 40
+False Positives: 12
+False Negatives: 31
 
 | Model                  | Precision | Recall | F1 Score | True Positives | False Positives | False Negatives |
 |------------------------|-----------|--------|----------|----------------|-----------------|-----------------|
