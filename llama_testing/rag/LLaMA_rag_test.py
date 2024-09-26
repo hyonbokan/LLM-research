@@ -67,11 +67,17 @@ def create_index(documents):
     index = VectorStoreIndex.from_documents(documents)
     return index
 
-# Query the engine
+# Query the engine with streaming support
 def query_bgp_data(index, query):
-    query_engine = index.as_query_engine()
+    query_engine = index.as_query_engine(streaming=True)
+    
+    # Start query and get the streaming response generator
     response = query_engine.query(query)
-    return response
+    
+    # Stream tokens to the console
+    for token in response.response_gen:
+        print(token, end="")
+        sys.stdout.flush()  # Flush to ensure immediate output
 
 # Main function
 def main():
@@ -84,12 +90,9 @@ def main():
     logger.info("Creating vector store index...")
     index = create_index(documents)
 
-    query = "What is the highest number of unique prefixes announced for AS15169?"
+    query = "What is BGP in computer network?"
     logger.info(f"Running query: {query}")
-    response = query_bgp_data(index, query)
+    query_bgp_data(index, query)
 
-    print(f"Query Result: {response}")
-
-# Run the script
 if __name__ == "__main__":
     main()

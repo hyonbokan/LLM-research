@@ -105,6 +105,59 @@ def preprocess_data(chunk):
     
     return result
 
+def preprocess_data_instruct(data):
+    """
+    Convert a DataFrame chunk into the specified JSON format for LLM training.
+
+    Parameters:
+    data (pd.DataFrame): The DataFrame chunk to convert.
+
+    Returns:
+    dict: A dictionary in the specified JSON format.
+    """
+    instruction = "The goal for this task is to determine if the data indicates an anomaly. Based on the context, section, and table columns provide important information for identifying the correct anomaly type. If an anomaly is detected, include the timestamp of the anomaly data and provide a reason explaining which values are anomalous and why. For example, 'anomaly detected at 2024-06-10 12:00:00 due to high value of num_routes=77'"
+    input_seg = "[TLE] The context is about BGP data analysis for detecting anomalies. The section is related to a specific time period of BGP monitoring. [TAB] col: | " + " | ".join(data.columns) + " |"
+    
+    for idx, row in data.iterrows():
+        input_seg += " row {}: | ".format(idx+1) + " | ".join([str(x) for x in row.values]) + " | [SEP]"
+    
+    
+    # Determine the output based on the anomaly_status column
+    anomaly_statuses = data.loc[data['anomaly_status'] != 'no anomalies detected', 'anomaly_status'].unique()
+    if len(anomaly_statuses) == 0:
+        output = "no anomalies detected"
+    else:
+        output = "; ".join(anomaly_statuses)
+    
+    result = {
+        "instruction": instruction,
+        "input": input_seg,
+        "output": output,
+    }
+    
+    return result
+
+def preprocess_data_to_txt(data, output_file='preprocessed_data.txt'):
+    """
+    Convert a DataFrame into a text format for LLM training and save to a file.
+
+    Parameters:
+    data (pd.DataFrame): The DataFrame to convert.
+    output_file (str): The output file to save the text. Default is 'preprocessed_data.txt'.
+    """
+    # Prepare the header with column names
+    input_seg = "[TAB] col: | " + " | ".join(data.columns) + " |"
+    
+    # Prepare the rows without splitting
+    for idx, row in data.iterrows():
+        input_seg += " row {}: | ".format(idx + 1) + " | ".join([str(x) for x in row.values]) + " |"
+    
+    # Save the processed data to a text file
+    with open(output_file, 'w') as f:
+        f.write(input_seg)
+    
+    print(f"Data successfully saved to {output_file}")
+
 def run_llm_inference(formatted_data, model, tokenizer, max_length=3050, output_results_file='llm_output.json'):
     """
     Run LLM inference on the formatted data and save the results to a JSON file.
@@ -183,3 +236,71 @@ def evaluate_llm_results(true_anomalies, llm_results):
         "false_positives": fp,
         "false_negatives": fn
     }
+    
+
+def df_to_plain_text_description(df, output=None):
+    """
+    Convert a DataFrame into a plain text description.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+
+    Returns:
+    str: A plain text description of the DataFrame content.
+    """
+    description = ""
+
+    for index, row in df.iterrows():
+        row_description = f"At {row['Timestamp']}, AS{row['Autonomous System Number']} observed {row['Announcements']} announcements"
+        
+        if 'Withdrawals' in df.columns and row['Withdrawals'] > 0:
+            row_description += f" and {row['Withdrawals']} withdrawals"
+        
+        if 'New Routes' in df.columns and row['New Routes'] > 0:
+            row_description += f". There were {row['New Routes']} new routes added"
+        
+        if 'Origin Changes' in df.columns and row['Origin Changes'] > 0:
+            row_description += f", with {row['Origin Changes']} origin changes"
+        
+        if 'Route Changes' in df.columns and row['Route Changes'] > 0:
+            row_description += f" and {row['Route Changes']} route changes"
+        
+        if 'Total Routes' in df.columns:
+            row_description += f". A total of {row['Total Routes']} routes were active"
+
+        if 'Maximum Path Length' in df.columns:
+            row_description += f", with a maximum path length of {row['Maximum Path Length']}"
+        
+        if 'Average Path Length' in df.columns:
+            row_description += f" and an average path length of {row['Average Path Length']}"
+        
+        if 'Maximum Edit Distance' in df.columns:
+            row_description += f". The maximum edit distance observed was {row['Maximum Edit Distance']}"
+        
+        if 'Average Edit Distance' in df.columns:
+            row_description += f" with an average edit distance of {row['Average Edit Distance']}"
+        
+        if 'Unique Prefixes Announced' in df.columns:
+            row_description += f". There were {row['Unique Prefixes Announced']} unique prefixes announced"
+
+        # Add graph-related features if available
+        if 'Graph Average Degree' in df.columns:
+            row_description += f". The graph's average degree was {row['Graph Average Degree']}"
+        
+        if 'Graph Betweenness Centrality' in df.columns:
+            row_description += f", betweenness centrality was {row['Graph Betweenness Centrality']}"
+        
+        if 'Graph Closeness Centrality' in df.columns:
+            row_description += f", closeness centrality was {row['Graph Closeness Centrality']}"
+        
+        if 'Graph Eigenvector Centrality' in df.columns:
+            row_description += f", and eigenvector centrality was {row['Graph Eigenvector Centrality']}"
+        
+        row_description += "."
+        description += row_description + "\n"
+        
+        if output:
+            with open(output, "w", encoding="utf-8") as file:
+                file.write(description.strip())
+                
+    return description.strip()
