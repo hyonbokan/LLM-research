@@ -131,7 +131,18 @@ The BGP features were extracted from a different repository: [BGP_data_analysis]
 ```yaml
 [TAB] col: | timestamp | asn | num_routes | num_new_routes | num_withdrawals | num_origin_changes | num_route_changes | max_path_length | avg_path_length | max_edit_distance | avg_edit_distance | num_announcements | num_unique_prefixes_announced | row 1: | 2022-03-28 09:35:00 | 8342.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 |
 ```
+## 5. Data Processing for RAG
+[Directory](finetune_main/finetuning_tabular/table_read/tablular_eval_util.py) contains scripts that facilitate the conversion of tabular data into various formats suitable for Retrieval-Augmented Generation (RAG). These formats are designed to enable efficient and effective training and querying of the LLaMA model with BGP data features, enhancing its ability to interact with the data in different contexts.
 
+The supported data processing formats include:
 
-## 5. Evaluation
+* Document List: Converts DataFrame entries into a list of documents where each row represents a separate document containing the BGP feature data. This format is ideal for situations where each record needs to be treated as an individual document.
+
+* Document Records Delimiters: Processes the DataFrame into a format where records are separated by specific delimiters. This is useful for parsing or tokenizing data in a structured manner during retrieval tasks.
+
+* JSON Structure: Converts the DataFrame into a structured JSON format, where each BGP feature and corresponding values are captured in a JSON-compatible format. This is ideal for scenarios requiring structured data for more complex retrieval and analysis.
+
+* Full Text: Transforms the DataFrame into a full-text representation of the BGP features, where each row is converted into a narrative format. This format is beneficial when the goal is to treat the BGP data as a detailed, plain text narrative, capturing all the essential metrics of the BGP session.
+
+## 6. Evaluation
 [Evaluation directory](evaluation/llama_bgp_eval_test.ipynb) contains evaluation scripts. The script begins by loading the fine-tuned LLaMA model, preparing it for the evaluation process. It includes procedures to feed prompts to the model and the model's response based on the prompts. In addition, the script contains specialized code to evaluate the model's knowledge of BGP. This evaluation focuses on the accuracy of the model's responses to BGP-related prompts.

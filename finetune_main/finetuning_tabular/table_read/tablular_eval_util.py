@@ -300,7 +300,343 @@ def df_to_plain_text_description(df, output=None):
         description += row_description + "\n"
         
         if output:
+            os.makedirs(os.path.dirname(output), exist_ok=True)
             with open(output, "w", encoding="utf-8") as file:
                 file.write(description.strip())
                 
     return description.strip()
+
+import os
+
+def df_to_document_list(df, output=None):
+    """
+    Convert a DataFrame into a list of plain text descriptions suitable for embedding models.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+    output (str, optional): The path to save the output text file containing all documents.
+
+    Returns:
+    List[str]: A list of plain text descriptions of the DataFrame content.
+    """
+    documents = []
+
+    for index, row in df.iterrows():
+        row_description = f"At {row['Timestamp']}, AS{row['Autonomous System Number']} observed {row['Announcements']} announcements"
+        
+        if 'Withdrawals' in df.columns and row['Withdrawals'] > 0:
+            row_description += f" and {row['Withdrawals']} withdrawals"
+        
+        if 'New Routes' in df.columns and row['New Routes'] > 0:
+            row_description += f". There were {row['New Routes']} new routes added"
+        
+        if 'Origin Changes' in df.columns and row['Origin Changes'] > 0:
+            row_description += f", with {row['Origin Changes']} origin changes"
+        
+        if 'Route Changes' in df.columns and row['Route Changes'] > 0:
+            row_description += f" and {row['Route Changes']} route changes"
+        
+        if 'Total Routes' in df.columns:
+            row_description += f". A total of {row['Total Routes']} routes were active"
+
+        if 'Maximum Path Length' in df.columns:
+            row_description += f", with a maximum path length of {row['Maximum Path Length']}"
+        
+        if 'Average Path Length' in df.columns:
+            row_description += f" and an average path length of {row['Average Path Length']}"
+        
+        if 'Maximum Edit Distance' in df.columns:
+            row_description += f". The maximum edit distance observed was {row['Maximum Edit Distance']}"
+        
+        if 'Average Edit Distance' in df.columns:
+            row_description += f" with an average edit distance of {row['Average Edit Distance']}"
+        
+        if 'Unique Prefixes Announced' in df.columns:
+            row_description += f". There were {row['Unique Prefixes Announced']} unique prefixes announced"
+
+        # Add graph-related features if available
+        if 'Graph Average Degree' in df.columns:
+            row_description += f". The graph's average degree was {row['Graph Average Degree']}"
+        
+        if 'Graph Betweenness Centrality' in df.columns:
+            row_description += f", betweenness centrality was {row['Graph Betweenness Centrality']}"
+        
+        if 'Graph Closeness Centrality' in df.columns:
+            row_description += f", closeness centrality was {row['Graph Closeness Centrality']}"
+        
+        if 'Graph Eigenvector Centrality' in df.columns:
+            row_description += f", and eigenvector centrality was {row['Graph Eigenvector Centrality']}"
+        
+        row_description += "."
+        documents.append(row_description)
+    
+    # Optionally save all documents to a single text file
+    if output:
+        os.makedirs(os.path.dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as file:
+            for doc in documents:
+                file.write(doc + "\n\n")
+                    
+    return documents
+
+
+def df_to_narrative(df, output=None):
+    """
+    Convert a DataFrame into a narrative text description.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+
+    Returns:
+    str: A narrative text description of the DataFrame content.
+    """
+    description = ""
+
+    for index, row in df.iterrows():
+        row_description = (
+            f"On {row['Timestamp']}, Autonomous System {row['Autonomous System Number']} observed "
+            f"{row['Announcements']} announcements"
+        )
+        if 'Withdrawals' in df.columns and row['Withdrawals'] > 0:
+            row_description += f" and {row['Withdrawals']} withdrawals"
+        row_description += ". "
+
+        if 'New Routes' in df.columns and row['New Routes'] > 0:
+            row_description += f"There were {row['New Routes']} new routes added. "
+
+        if 'Origin Changes' in df.columns and row['Origin Changes'] > 0:
+            row_description += f"{row['Origin Changes']} origin changes occurred. "
+
+        if 'Route Changes' in df.columns and row['Route Changes'] > 0:
+            row_description += f"{row['Route Changes']} route changes were detected. "
+
+        if 'Total Routes' in df.columns:
+            row_description += f"The total number of active routes was {row['Total Routes']}. "
+
+        if 'Maximum Path Length' in df.columns:
+            row_description += f"The maximum path length observed was {row['Maximum Path Length']} hops, "
+
+        if 'Average Path Length' in df.columns:
+            row_description += f"with an average path length of {row['Average Path Length']} hops. "
+
+        description += row_description + "\n"
+
+    if output:
+        os.makedirs(os.path.dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as file:
+            file.write(description.strip())
+
+    return description.strip()
+
+
+def df_to_narrative_with_delimiters(df, output=None):
+    """
+    Convert a DataFrame into a narrative text description with clear delimiters.
+    
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+    
+    Returns:
+    str: A narrative text description of the DataFrame content.
+    """
+    description = "<BEGIN_CONTEXT>\n"
+    
+    for index, row in df.iterrows():
+        row_description = (
+            f"Record {index+1}:\n"
+            f"Timestamp: {row['Timestamp']}\n"
+            f"Autonomous System Number: {row['Autonomous System Number']}\n"
+            f"Announcements: {row['Announcements']}\n"
+        )
+        if 'Withdrawals' in df.columns:
+            row_description += f"Withdrawals: {row['Withdrawals']}\n"
+        if 'New Routes' in df.columns:
+            row_description += f"New Routes: {row['New Routes']}\n"
+        if 'Origin Changes' in df.columns:
+            row_description += f"Origin Changes: {row['Origin Changes']}\n"
+        if 'Route Changes' in df.columns:
+            row_description += f"Route Changes: {row['Route Changes']}\n"
+        if 'Total Routes' in df.columns:
+            row_description += f"Total Routes: {row['Total Routes']}\n"
+        if 'Maximum Path Length' in df.columns:
+            row_description += f"Maximum Path Length: {row['Maximum Path Length']} hops\n"
+        if 'Average Path Length' in df.columns:
+            row_description += f"Average Path Length: {row['Average Path Length']} hops\n"
+        if 'Unique Prefixes Announced' in df.columns:
+            row_description += f"Unique Prefixes Announced: {row['Unique Prefixes Announced']}\n"
+        
+        description += row_description + "\n"
+    
+    description += "<END_CONTEXT>"
+    
+    if output:
+        os.makedirs(os.path.dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as file:
+            file.write(description.strip())
+    
+    return description.strip()
+
+
+def df_to_distinctive_text(df, output=None):
+    """
+    Convert a DataFrame into text with enhanced distinctiveness for embeddings.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+
+    Returns:
+    str: A text representation designed for better embeddings.
+    """
+    texts = []
+    for index, row in df.iterrows():
+        text = (
+            f"Record ID: {index}\n"
+            f"Timestamp: {row['Timestamp']}\n"
+            f"AS Number: {row['Autonomous System Number']}\n"
+            f"Announcements: {row['Announcements']}\n"
+            f"Withdrawals: {row.get('Withdrawals', 0)}\n"
+            f"New Routes: {row.get('New Routes', 0)}\n"
+            f"Origin Changes: {row.get('Origin Changes', 0)}\n"
+            f"Route Changes: {row.get('Route Changes', 0)}\n"
+            f"Total Routes: {row.get('Total Routes', 0)}\n"
+            f"Max Path Length: {row.get('Maximum Path Length', 0)}\n"
+            f"Avg Path Length: {row.get('Average Path Length', 0)}\n"
+        )
+        texts.append(text)
+    
+    full_text = "\n".join(texts)
+    if output:
+        os.makedirs(os.path.dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as file:
+            file.write(full_text)
+    return full_text
+
+import os
+
+def df_to_structured_text(df, output):
+    """
+    Convert a DataFrame into a structured text format suitable for embedding models.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+    output (str): The path to save the output text file.
+
+    Returns:
+    str: A structured text representation of the DataFrame content.
+    """
+    texts = []
+    for index, row in df.iterrows():
+        record_id = index + 1  # Unique identifier for each record
+        row_description = f"## RECORD {record_id} ##\n"
+        row_description += f"Timestamp: {row['Timestamp']}\n"
+        row_description += f"Autonomous System Number: AS{row['Autonomous System Number']}\n"
+        row_description += f"Announcements: {row['Announcements']} messages\n"
+        
+        if 'Withdrawals' in df.columns:
+            row_description += f"Withdrawals: {row.get('Withdrawals', 0)} messages\n"
+        if 'New Routes' in df.columns:
+            row_description += f"New Routes: {row.get('New Routes', 0)} routes\n"
+        if 'Origin Changes' in df.columns:
+            row_description += f"Origin Changes: {row.get('Origin Changes', 0)} changes\n"
+        if 'Route Changes' in df.columns:
+            row_description += f"Route Changes: {row.get('Route Changes', 0)} changes\n"
+        if 'Total Routes' in df.columns:
+            row_description += f"Total Routes: {row.get('Total Routes', 0)} routes\n"
+        if 'Maximum Path Length' in df.columns:
+            row_description += f"Maximum Path Length: {row.get('Maximum Path Length', 0)} hops\n"
+        if 'Average Path Length' in df.columns:
+            row_description += f"Average Path Length: {row.get('Average Path Length', 0)} hops\n"
+        if 'Maximum Edit Distance' in df.columns:
+            row_description += f"Maximum Edit Distance: {row.get('Maximum Edit Distance', 0)}\n"
+        if 'Average Edit Distance' in df.columns:
+            row_description += f"Average Edit Distance: {row.get('Average Edit Distance', 0)}\n"
+        if 'Unique Prefixes Announced' in df.columns:
+            row_description += f"Unique Prefixes Announced: {row.get('Unique Prefixes Announced', 0)} prefixes\n"
+        if 'Graph Average Degree' in df.columns:
+            row_description += f"Graph Average Degree: {row.get('Graph Average Degree', 0)}\n"
+        if 'Graph Betweenness Centrality' in df.columns:
+            row_description += f"Graph Betweenness Centrality: {row.get('Graph Betweenness Centrality', 0)}\n"
+        if 'Graph Closeness Centrality' in df.columns:
+            row_description += f"Graph Closeness Centrality: {row.get('Graph Closeness Centrality', 0)}\n"
+        if 'Graph Eigenvector Centrality' in df.columns:
+            row_description += f"Graph Eigenvector Centrality: {row.get('Graph Eigenvector Centrality', 0)}\n"
+        
+        texts.append(row_description)
+
+    # Combine all records into one text
+    full_text = "\n".join(texts)
+    
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(output), exist_ok=True)
+    
+    # Save the full text to the output file
+    with open(output, "w", encoding="utf-8") as file:
+        file.write(full_text.strip())
+    
+    return full_text.strip()
+
+import os
+import json
+
+def df_to_json_format(df, output):
+    """
+    Convert a DataFrame into a JSON format suitable for embedding models.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+    output (str): The path to save the output JSON file.
+
+    Returns:
+    str: A JSON string representation of the DataFrame content.
+    """
+    records = []
+    for index, row in df.iterrows():
+        record = {
+            "Record ID": index + 1,
+            "Timestamp": str(row['Timestamp']),
+            "Autonomous System Number": f"AS{row['Autonomous System Number']}",
+            "Announcements": f"{row['Announcements']} messages",
+        }
+
+        if 'Withdrawals' in df.columns:
+            record["Withdrawals"] = f"{row.get('Withdrawals', 0)} messages"
+        if 'New Routes' in df.columns:
+            record["New Routes"] = f"{row.get('New Routes', 0)} routes"
+        if 'Origin Changes' in df.columns:
+            record["Origin Changes"] = f"{row.get('Origin Changes', 0)} changes"
+        if 'Route Changes' in df.columns:
+            record["Route Changes"] = f"{row.get('Route Changes', 0)} changes"
+        if 'Total Routes' in df.columns:
+            record["Total Routes"] = f"{row.get('Total Routes', 0)} routes"
+        if 'Maximum Path Length' in df.columns:
+            record["Maximum Path Length"] = f"{row.get('Maximum Path Length', 0)} hops"
+        if 'Average Path Length' in df.columns:
+            record["Average Path Length"] = f"{row.get('Average Path Length', 0)} hops"
+        if 'Maximum Edit Distance' in df.columns:
+            record["Maximum Edit Distance"] = row.get('Maximum Edit Distance', 0)
+        if 'Average Edit Distance' in df.columns:
+            record["Average Edit Distance"] = row.get('Average Edit Distance', 0)
+        if 'Unique Prefixes Announced' in df.columns:
+            record["Unique Prefixes Announced"] = f"{row.get('Unique Prefixes Announced', 0)} prefixes"
+        if 'Graph Average Degree' in df.columns:
+            record["Graph Average Degree"] = row.get('Graph Average Degree', 0)
+        if 'Graph Betweenness Centrality' in df.columns:
+            record["Graph Betweenness Centrality"] = row.get('Graph Betweenness Centrality', 0)
+        if 'Graph Closeness Centrality' in df.columns:
+            record["Graph Closeness Centrality"] = row.get('Graph Closeness Centrality', 0)
+        if 'Graph Eigenvector Centrality' in df.columns:
+            record["Graph Eigenvector Centrality"] = row.get('Graph Eigenvector Centrality', 0)
+
+        records.append(record)
+
+    # Convert the list of records to JSON string
+    json_data = json.dumps(records, indent=2)
+
+    # Ensure the output directory exists
+    os.makedirs(os.path.dirname(output), exist_ok=True)
+
+    # Save the JSON string to the output file
+    with open(output, "w", encoding="utf-8") as file:
+        file.write(json_data)
+
+    return json_data
