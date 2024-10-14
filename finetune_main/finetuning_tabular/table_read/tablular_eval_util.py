@@ -5,6 +5,7 @@ from transformers import pipeline
 import csv
 from collections import defaultdict, Counter
 import ast
+import inflect
 
 def combine_csv_files(directory):
     """
@@ -48,9 +49,6 @@ def split_dataframe(input_data, split_size=10):
     data_list = [df.iloc[i*split_size:(i+1)*split_size].reset_index(drop=True) for i in range(num_chunks)]
     
     return data_list
-
-import pandas as pd
-import numpy as np
 
 def shuffle_and_split_dataframe(input_data, split_size=10):
     """
@@ -240,6 +238,70 @@ def evaluate_llm_results(true_anomalies, llm_results):
         "false_negatives": fn
     }
 
+
+def number_to_text(number):
+    p = inflect.engine()
+    if isinstance(number, float) or isinstance(number, int):
+        return p.number_to_words(int(number))  # Handling integers for simplicity, you can enhance to handle floats better
+    return str(number)
+
+def df_to_full_text_narrative(df, output=None):
+    """
+    Convert a DataFrame into a narrative text description, converting numerical data into text.
+
+    Parameters:
+    df (pd.DataFrame): The DataFrame to convert.
+    output (str): Optional. The file path to save the narrative as a text file.
+
+    Returns:
+    str: A narrative text description of the DataFrame content.
+    """
+    description = ""
+
+    for index, row in df.iterrows():
+        row_description = (
+            f"On {row['Timestamp']}, Autonomous System {number_to_text(row['Autonomous System Number'])} observed "
+            f"{number_to_text(row['Announcements'])} announcements"
+        )
+        
+        # Handle Withdrawals
+        if 'Withdrawals' in df.columns and row['Withdrawals'] > 0:
+            row_description += f" and {number_to_text(row['Withdrawals'])} withdrawals"
+        row_description += ". "
+
+        # Handle New Routes
+        if 'New Routes' in df.columns and row['New Routes'] > 0:
+            row_description += f"There were {number_to_text(row['New Routes'])} new routes added. "
+
+        # Handle Origin Changes
+        if 'Origin Changes' in df.columns and row['Origin Changes'] > 0:
+            row_description += f"{number_to_text(row['Origin Changes'])} origin changes occurred. "
+
+        # Handle Route Changes
+        if 'Route Changes' in df.columns and row['Route Changes'] > 0:
+            row_description += f"{number_to_text(row['Route Changes'])} route changes were detected. "
+
+        # Handle Total Routes
+        if 'Total Routes' in df.columns:
+            row_description += f"The total number of active routes was {number_to_text(row['Total Routes'])}. "
+
+        # Handle Maximum Path Length
+        if 'Maximum Path Length' in df.columns:
+            row_description += f"The maximum path length observed was {number_to_text(row['Maximum Path Length'])} hops, "
+
+        # Handle Average Path Length
+        if 'Average Path Length' in df.columns:
+            row_description += f"with an average path length of {number_to_text(row['Average Path Length'])} hops. "
+
+        description += row_description + "\n"
+
+    # If output is specified, save the narrative to a text file
+    if output:
+        os.makedirs(os.path.dirname(output), exist_ok=True)
+        with open(output, "w", encoding="utf-8") as file:
+            file.write(description.strip())
+
+    return description.strip()
 
 def process_bgp_csv(
     csv_file_path,
@@ -952,54 +1014,6 @@ def df_to_narrative(df, output=None):
         with open(output, "w", encoding="utf-8") as file:
             file.write(description.strip())
 
-    return description.strip()
-
-
-def df_to_narrative_with_delimiters(df, output=None):
-    """
-    Convert a DataFrame into a narrative text description with clear delimiters.
-    
-    Parameters:
-    df (pd.DataFrame): The DataFrame to convert.
-    
-    Returns:
-    str: A narrative text description of the DataFrame content.
-    """
-    description = "<BEGIN_CONTEXT>\n"
-    
-    for index, row in df.iterrows():
-        row_description = (
-            f"Record {index+1}:\n"
-            f"Timestamp: {row['Timestamp']}\n"
-            f"Autonomous System Number: {row['Autonomous System Number']}\n"
-            f"Announcements: {row['Announcements']}\n"
-        )
-        if 'Withdrawals' in df.columns:
-            row_description += f"Withdrawals: {row['Withdrawals']}\n"
-        if 'New Routes' in df.columns:
-            row_description += f"New Routes: {row['New Routes']}\n"
-        if 'Origin Changes' in df.columns:
-            row_description += f"Origin Changes: {row['Origin Changes']}\n"
-        if 'Route Changes' in df.columns:
-            row_description += f"Route Changes: {row['Route Changes']}\n"
-        if 'Total Routes' in df.columns:
-            row_description += f"Total Routes: {row['Total Routes']}\n"
-        if 'Maximum Path Length' in df.columns:
-            row_description += f"Maximum Path Length: {row['Maximum Path Length']} hops\n"
-        if 'Average Path Length' in df.columns:
-            row_description += f"Average Path Length: {row['Average Path Length']} hops\n"
-        if 'Unique Prefixes Announced' in df.columns:
-            row_description += f"Unique Prefixes Announced: {row['Unique Prefixes Announced']}\n"
-        
-        description += row_description + "\n"
-    
-    description += "<END_CONTEXT>"
-    
-    if output:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
-        with open(output, "w", encoding="utf-8") as file:
-            file.write(description.strip())
-    
     return description.strip()
 
 
