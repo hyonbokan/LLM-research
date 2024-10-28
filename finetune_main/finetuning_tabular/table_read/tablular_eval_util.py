@@ -6,6 +6,7 @@ import csv
 from collections import defaultdict, Counter
 import ast
 import inflect
+import matplotlib.pyplot as plt
 
 def combine_csv_files(directory):
     """
@@ -239,374 +240,502 @@ def evaluate_llm_results(true_anomalies, llm_results):
     }
 
 
-def number_to_text(number):
-    p = inflect.engine()
-    if isinstance(number, float) or isinstance(number, int):
-        return p.number_to_words(int(number))  # Handling integers for simplicity, you can enhance to handle floats better
-    return str(number)
-
-def df_to_full_text_narrative(df, output=None):
-    """
-    Convert a DataFrame into a narrative text description, converting numerical data into text.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame to convert.
-    output (str): Optional. The file path to save the narrative as a text file.
-
-    Returns:
-    str: A narrative text description of the DataFrame content.
-    """
-    description = ""
-
-    for index, row in df.iterrows():
-        row_description = (
-            f"On {row['Timestamp']}, Autonomous System {number_to_text(row['Autonomous System Number'])} observed "
-            f"{number_to_text(row['Announcements'])} announcements"
-        )
-        
-        # Handle Withdrawals
-        if 'Withdrawals' in df.columns and row['Withdrawals'] > 0:
-            row_description += f" and {number_to_text(row['Withdrawals'])} withdrawals"
-        row_description += ". "
-
-        # Handle New Routes
-        if 'New Routes' in df.columns and row['New Routes'] > 0:
-            row_description += f"There were {number_to_text(row['New Routes'])} new routes added. "
-
-        # Handle Origin Changes
-        if 'Origin Changes' in df.columns and row['Origin Changes'] > 0:
-            row_description += f"{number_to_text(row['Origin Changes'])} origin changes occurred. "
-
-        # Handle Route Changes
-        if 'Route Changes' in df.columns and row['Route Changes'] > 0:
-            row_description += f"{number_to_text(row['Route Changes'])} route changes were detected. "
-
-        # Handle Total Routes
-        if 'Total Routes' in df.columns:
-            row_description += f"The total number of active routes was {number_to_text(row['Total Routes'])}. "
-
-        # Handle Maximum Path Length
-        if 'Maximum Path Length' in df.columns:
-            row_description += f"The maximum path length observed was {number_to_text(row['Maximum Path Length'])} hops, "
-
-        # Handle Average Path Length
-        if 'Average Path Length' in df.columns:
-            row_description += f"with an average path length of {number_to_text(row['Average Path Length'])} hops. "
-
-        description += row_description + "\n"
-
-    # If output is specified, save the narrative to a text file
-    if output:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
-        with open(output, "w", encoding="utf-8") as file:
-            file.write(description.strip())
-
-    return description.strip()
-
 def process_bgp_csv(
     csv_file_path,
     output_dir='processed_output',
     overall_summary_filename='overall_summary.txt',
-    data_point_summaries_filename='data_point_summaries.txt',
+    data_point_logs_filename='data_point_logs.txt',
     prefix_announcements_filename='prefix_announcements.txt',
     prefix_withdrawals_filename='prefix_withdrawals.txt',
     updates_per_peer_filename='updates_per_peer.txt',
-    top_n_prefixes=10,  # Number of top prefixes to include in the overall summary
-    top_n_peers=10      # Number of top peers to include in the overall summary
+    hijacking_filename='hijacking_anomalies.txt',
+    leaks_filename='leaks_anomalies.txt',
+    outages_filename='outages_anomalies.txt',
+    anomaly_summary_filename='anomaly_summary.txt',
+    top_n_peers=10       # Number of top peers to include in the overall summary
 ):
     """
-    Processes a BGP CSV file and generates enriched text files for:
-    1. Overall summary with min and max values, top peers, and frequent prefixes.
+    Processes a BGP CSV file and generates enriched text files in narrative format for:
+    1. Overall summary with key statistics and top peers.
     2. Textual summaries of each data point.
     3. Prefix announcement information.
     4. Prefix withdrawal information.
     5. Updates per peer information.
-
+    6. Detailed anomaly detection logs for hijacking, leaks, and outages.
+    7. Anomaly summary indicating if anomalies were detected.
+    
     Args:
         csv_file_path (str): Path to the input CSV file.
         output_dir (str): Directory where output files will be saved.
         overall_summary_filename (str): Filename for overall summary.
-        data_point_summaries_filename (str): Filename for data point summaries.
+        data_point_logs_filename (str): Filename for data point logs.
         prefix_announcements_filename (str): Filename for prefix announcements.
         prefix_withdrawals_filename (str): Filename for prefix withdrawals.
         updates_per_peer_filename (str): Filename for updates per peer.
-        top_n_prefixes (int): Number of top prefixes to include in the overall summary.
+        hijacking_filename (str): Filename for hijacking anomalies.
+        leaks_filename (str): Filename for leaks anomalies.
+        outages_filename (str): Filename for outages anomalies.
+        anomaly_summary_filename (str): Filename for anomaly summary.
         top_n_peers (int): Number of top peers to include in the overall summary.
     """
+    # Define explanations for anomalies
+    anomaly_definitions = {
+        "Hijacking": (
+            "BGP Hijacking occurs when an Autonomous System (AS) falsely advertises IP prefixes that it does not own, "
+            "potentially diverting traffic to malicious destinations or causing network disruptions."
+        ),
+        "Leaks": (
+            "BGP Leaks refer to the unintended or malicious disclosure of internal routing information to external networks, "
+            "which can lead to traffic misrouting and reduced network performance."
+        ),
+        "Outages": (
+            "BGP Outages happen when there is a loss of connectivity or a significant reduction in the number of active routes, "
+            "resulting in disrupted network services."
+        )
+    }
+
+    # Define detection methodologies for anomalies
+    anomaly_detection_methods = {
+        "Hijacking": (
+            "Anomalies related to hijacking were detected using two key indicators based on statistical thresholds:\n"
+            "1. High Announcements: If the number of announcements exceeded the mean by three standard deviations (Threshold: {threshold_announcements}), "
+            "it was flagged as a potential hijack.\n"
+            "   - Observed Announcements: {observed_announcements}\n"
+            "   - Mean Announcements: {mean_announcements}\n"
+            "   - Standard Deviation (Announcements): {std_announcements}\n\n"
+            "2. Unexpected ASNs in Paths: If the count of unexpected ASNs in BGP paths exceeded the mean by two standard deviations (Threshold: {threshold_unexpected_asns}), "
+            "it indicated a possible hijack.\n"
+            "   - Observed Unexpected ASNs: {observed_unexpected_asns}\n"
+            "   - Mean Unexpected ASNs: {mean_unexpected_asns}\n"
+            "   - Standard Deviation (Unexpected ASNs): {std_unexpected_asns}\n"
+        ),
+        "Leaks": (
+            "Anomalies related to leaks were detected by monitoring withdrawal activities using statistical thresholds:\n"
+            "1. High Withdrawals: If the number of withdrawals exceeded the mean by three standard deviations (Threshold: {threshold_withdrawals}), "
+            "it was flagged as a potential leak or outage.\n"
+            "   - Observed Withdrawals: {observed_withdrawals}\n"
+            "   - Mean Withdrawals: {mean_withdrawals}\n"
+            "   - Standard Deviation (Withdrawals): {std_withdrawals}\n"
+        ),
+        "Outages": (
+            "Anomalies related to outages were identified by observing the total number of active routes using statistical thresholds:\n"
+            "1. Low Total Routes: If the total number of active routes fell below the mean by three standard deviations (Threshold: {threshold_total_routes}), "
+            "it was indicative of a potential outage.\n"
+            "   - Observed Total Routes: {observed_total_routes}\n"
+            "   - Mean Total Routes: {mean_total_routes}\n"
+            "   - Standard Deviation (Total Routes): {std_total_routes}\n"
+        )
+    }
+
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Initialize variables for overall summary
-    min_values = {}
-    max_values = {}
+    # Read the CSV file into a pandas DataFrame for easier manipulation
+    try:
+        df = pd.read_csv(csv_file_path)
+        print("CSV file successfully read. Here's a preview:")
+        print(df.head())
+        print("\nColumn Names:")
+        print(df.columns.tolist())
+    except FileNotFoundError:
+        print(f"Error: The file '{csv_file_path}' was not found.")
+        return
+    except pd.errors.EmptyDataError:
+        print(f"Error: The file '{csv_file_path}' is empty.")
+        return
+    except pd.errors.ParserError as e:
+        print(f"Error parsing '{csv_file_path}': {e}")
+        return
 
-    # Dictionaries to store overall peer updates and prefix counts
+    # Define numeric columns (ensure these are the actual numeric columns in your CSV)
+    numeric_columns = [
+        'Total Routes', 'New Routes', 'Withdrawals', 'Origin Changes', 'Route Changes',
+        'Maximum Path Length', 'Average Path Length', 'Maximum Edit Distance', 'Average Edit Distance',
+        'Announcements', 'Unique Prefixes Announced', 'Average MED', 'Average Local Preference',
+        'Total Communities', 'Unique Communities', 'Total Updates', 'Average Updates per Peer',
+        'Max Updates from a Single Peer', 'Min Updates from a Single Peer', 'Std Dev of Updates',
+        'Total Prefixes Announced', 'Average Announcements per Prefix',
+        'Max Announcements for a Single Prefix', 'Min Announcements for a Single Prefix',
+        'Std Dev of Announcements', 'Count of Unexpected ASNs in Paths',
+        'Target Prefixes Withdrawn', 'Target Prefixes Announced', 'AS Path Changes',
+        'Average Prefix Length', 'Max Prefix Length', 'Min Prefix Length'
+    ]
+
+    # Identify which numeric columns are present in the DataFrame
+    numeric_columns_present = [col for col in numeric_columns if col in df.columns]
+
+    # Convert numeric columns to float, handle errors by setting invalid entries to 0
+    for col in numeric_columns_present:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0.0)
+
+    # Warn about missing numeric columns and fill them with 0.0
+    missing_numeric_columns = set(numeric_columns) - set(numeric_columns_present)
+    for col in missing_numeric_columns:
+        print(f"Warning: Column '{col}' not found in the CSV. Filling with 0.0.")
+        df[col] = 0.0
+        numeric_columns_present.append(col)  # Add to present list to include in computations
+
+    # Handle list columns (Top Peers and Top Prefixes) appropriately
+    peer_columns = ['Top Peer 1 ASN', 'Top Peer 2 ASN', 'Top Peer 3 ASN', 'Top Peer 4 ASN', 'Top Peer 5 ASN']
+    prefix_columns = ['Top Prefix 1', 'Top Prefix 2', 'Top Prefix 3', 'Top Prefix 4', 'Top Prefix 5']
+
+    # Convert peer columns to lists
+    for col in peer_columns:
+        if col in df.columns:
+            df[col] = df[col].astype(str).apply(
+                lambda x: [item.strip() for item in x.strip("[]").replace("'", "").split(',') if item.strip()]
+            )
+        else:
+            print(f"Warning: Column '{col}' not found in the CSV. Filling with empty lists.")
+            df[col] = [[] for _ in range(len(df))]
+    
+    # Convert prefix columns to strings and handle '0' as no prefix
+    for col in prefix_columns:
+        if col in df.columns:
+            df[col] = df[col].astype(str).apply(
+                lambda x: '' if x.strip() == '0' else x.strip("[]").replace("'", "").strip()
+            )
+        else:
+            print(f"Warning: Column '{col}' not found in the CSV. Filling with empty strings.")
+            df[col] = ''  # Empty string instead of list
+
+    # Initialize min and max dictionaries for overall summary
+    summary_metrics = {}
+    for col in numeric_columns_present:
+        summary_metrics[col] = {
+            'min': df[col].min(),
+            'max': df[col].max(),
+            'average': df[col].mean(),
+            'std_dev': df[col].std()
+        }
+
+    # Pre-calculate means and std_dev for detection methodologies
+    means = df[numeric_columns_present].mean()
+    std_devs = df[numeric_columns_present].std()
+
+    # Calculate total updates per peer
     total_updates_per_peer = defaultdict(float)
-    prefix_announcement_counter = Counter()
-    prefix_withdrawal_counter = Counter()
+    for idx, row in df.iterrows():
+        peers_nested = row[peer_columns]  # List of lists
+        # Flatten the list of peers
+        peers = [asn for peer_list in peers_nested for asn in peer_list]
+        for peer_asn in peers:
+            # Ensure peer_asn is a string before calling isdigit()
+            if isinstance(peer_asn, str) and peer_asn.isdigit():
+                # Accumulate the updates per peer ASN
+                total_updates_per_peer[peer_asn] += row['Average Updates per Peer']
 
-    # Lists to store textual summaries and other information
-    data_point_summaries = []
+    # Calculate prefix announcement counts
+    prefix_announcement_counter = Counter()
+    for idx, row in df.iterrows():
+        for col in prefix_columns:
+            prefix = row[col]
+            if prefix and prefix != '0':
+                # If multiple prefixes are present in a single string separated by commas, split them
+                split_prefixes = [p.strip() for p in prefix.split(',') if p.strip() and p.strip() != '0']
+                for p in split_prefixes:
+                    prefix_announcement_counter[p] += 1
+
+    # Calculate prefix withdrawal counts
+    prefix_withdrawal_counter = Counter()
+    for idx, row in df.iterrows():
+        withdrawn_prefixes_str = row.get('Target Prefixes Withdrawn', '0')
+        if isinstance(withdrawn_prefixes_str, str) and withdrawn_prefixes_str.strip() and withdrawn_prefixes_str.strip() != '0':
+            try:
+                withdrawn_prefixes = ast.literal_eval(withdrawn_prefixes_str)
+                if isinstance(withdrawn_prefixes, list):
+                    for prefix in withdrawn_prefixes:
+                        if isinstance(prefix, list):
+                            # Handle nested lists
+                            if len(prefix) == 1 and isinstance(prefix[0], str):
+                                prefix = prefix[0]
+                            else:
+                                print(f"Warning: Found a nested list in withdrawn prefix: {prefix}. Skipping.")
+                                continue
+                        if isinstance(prefix, str) and prefix.strip() != '0':
+                            prefix_withdrawal_counter[prefix.strip()] += 1
+            except (SyntaxError, ValueError):
+                print(f"Warning: Could not parse 'Target Prefixes Withdrawn' at index {idx}. Skipping.")
+
+    # Define anomaly thresholds based on mean and standard deviation
+    anomaly_thresholds = {}
+    if 'Withdrawals' in df.columns:
+        anomaly_thresholds['Withdrawals'] = means['Withdrawals'] + 3 * std_devs['Withdrawals']
+    if 'Announcements' in df.columns:
+        anomaly_thresholds['Announcements'] = means['Announcements'] + 3 * std_devs['Announcements']
+    if 'Total Routes' in df.columns:
+        anomaly_thresholds['Total Routes'] = means['Total Routes'] - 3 * std_devs['Total Routes']
+    if 'Count of Unexpected ASNs in Paths' in df.columns:
+        anomaly_thresholds['Unexpected ASNs'] = means['Count of Unexpected ASNs in Paths'] + 2 * std_devs['Count of Unexpected ASNs in Paths']
+
+    # Generate Overall Summary in Narrative Format
+    overall_summary_text = "Overall Summary:\n\n"
+
+    # Create a narrative paragraph summarizing key statistics
+    overall_summary_text += (
+        f"During the observation period, Autonomous Systems reported various BGP metrics. "
+        f"The total number of routes ranged from {int(summary_metrics['Total Routes']['min'])} to {int(summary_metrics['Total Routes']['max'])}, "
+        f"with an average of {summary_metrics['Total Routes']['average']:.2f} routes. "
+        f"Announcements varied between {int(summary_metrics['Announcements']['min'])} and {int(summary_metrics['Announcements']['max'])}, "
+        f"averaging {summary_metrics['Announcements']['average']:.2f} announcements. "
+        f"Withdrawals were consistently {int(summary_metrics['Withdrawals']['min'])} throughout the period. "
+        f"The maximum path length observed was {int(summary_metrics['Maximum Path Length']['max'])} hops, "
+        f"with an average path length of {summary_metrics['Average Path Length']['average']:.2f} hops. "
+        f"Communities ranged from {int(summary_metrics['Total Communities']['min'])} to {int(summary_metrics['Total Communities']['max'])}, "
+        f"with an average of {summary_metrics['Total Communities']['average']:.2f}. "
+        f"The system observed an average of {summary_metrics['Average Prefix Length']['average']:.1f} prefix length, "
+        f"with a maximum of {int(summary_metrics['Max Prefix Length']['max'])} and a minimum of {int(summary_metrics['Min Prefix Length']['min'])}."
+    )
+    overall_summary_text += "\n\n"
+
+    # Add top peers by total updates with descriptive language
+    overall_summary_text += f"Top {top_n_peers} Peers with the Highest Number of Updates:\n"
+    sorted_peers = sorted(total_updates_per_peer.items(), key=lambda x: x[1], reverse=True)[:top_n_peers]
+    if sorted_peers:
+        peer_details = ', '.join([f"AS{asn} ({updates:.2f} updates)" for asn, updates in sorted_peers])
+        overall_summary_text += (
+            f"The top {top_n_peers} peers contributing the most updates are {peer_details}.\n"
+        )
+    else:
+        overall_summary_text += "No peer updates data available.\n"
+    overall_summary_text += "\n"
+
+    # Write Overall Summary to File
+    with open(os.path.join(output_dir, overall_summary_filename), 'w', encoding='utf-8') as f:
+        f.write(overall_summary_text)
+
+    # Initialize anomaly logs and other lists
+    data_point_logs = []
+    hijacking_anomalies = []
+    leaks_anomalies = []
+    outages_anomalies = []
     prefix_announcements = []
     prefix_withdrawals = []
     updates_per_peer_info = []
 
-    # Read the CSV file
-    with open(csv_file_path, 'r', newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
-        rows = list(reader)
+    # Process each data point for logs and anomalies
+    for idx, row in df.iterrows():
+        timestamp = row.get('Timestamp', 'N/A')
+        as_number = row.get('Autonomous System Number', 'N/A')
 
-        # Get list of peers from column names
-        peer_columns = [col for col in reader.fieldnames if col.startswith('Updates per Peer_')]
+        # Collect all prefixes as a single string, excluding '0's
+        prefixes = []
+        for col in prefix_columns:
+            prefix = row[col]
+            if prefix and prefix != '0':
+                split_prefixes = [p.strip() for p in prefix.split(',') if p.strip() and p.strip() != '0']
+                prefixes.extend(split_prefixes)
+        prefixes_str = ', '.join(prefixes) if prefixes else 'None'
 
-        # Initialize min and max dictionaries
-        numeric_columns = [
-            'Total Routes', 'New Routes', 'Withdrawals', 'Origin Changes', 'Route Changes',
-            'Maximum Path Length', 'Average Path Length', 'Maximum Edit Distance', 'Average Edit Distance',
-            'Announcements', 'Unique Prefixes Announced', 'Graph Average Degree',
-            'Graph Betweenness Centrality', 'Graph Closeness Centrality', 'Graph Eigenvector Centrality',
-            'Average MED', 'Average Local Preference', 'Total Communities', 'Unique Communities',
-            'Number of Unique Peers',
-            'Prefixes with AS Path Prepending', 'Bogon Prefixes Detected', 'Average Prefix Length',
-            'Max Prefix Length', 'Min Prefix Length'
-        ]
+        # Collect all peers as a single string
+        peers = []
+        for col in peer_columns:
+            peer_list = row[col]  # List of ASNs
+            peers.extend(peer_list)
+        peers_str = ', '.join(peers) if peers else 'None'
 
-        for col in numeric_columns:
-            min_values[col] = float('inf')
-            max_values[col] = float('-inf')
+        # Create the narrative log entry
+        log_entry = (
+            f"On {timestamp}, Autonomous System {as_number} observed {int(row['Announcements'])} announcements. "
+            f"There were {int(row['New Routes'])} new routes added. The total number of active routes was {int(row['Total Routes'])}. "
+            f"The maximum path length observed was {int(row['Maximum Path Length'])} hops, with an average path length of {row['Average Path Length']:.2f} hops. "
+            f"The maximum edit distance was {int(row['Maximum Edit Distance'])}, with an average of {row['Average Edit Distance']:.1f}. "
+            f"The average MED was {row['Average MED']:.2f}. The average local preference was {row['Average Local Preference']:.2f}. "
+            f"There were {int(row['Total Communities'])} total communities observed, with {int(row['Unique Communities'])} unique communities. "
+            f"The number of unique peers was {int(row['Average Updates per Peer'])}. "
+            f"The average prefix length was {row['Average Prefix Length']:.1f}, with a maximum of {int(row['Max Prefix Length'])} and a minimum of {int(row['Min Prefix Length'])}. "
+            f"Number of prefixes announced: {int(row['Total Prefixes Announced'])}. Number of prefixes withdrawn: {int(row['Target Prefixes Withdrawn'])}."
+        )
+        data_point_logs.append(log_entry + "\n")
 
-        # Process each row
-        for row in rows:
-            timestamp = row['Timestamp']
-            as_number = row['Autonomous System Number']
-
-            # Update min and max values
-            for col in numeric_columns:
+        # Collect prefix announcements
+        if row['Total Prefixes Announced'] > 0:
+            prefixes_announced_str = row.get('Target Prefixes Announced', '0')
+            if isinstance(prefixes_announced_str, str) and prefixes_announced_str.strip() != '0':
                 try:
-                    value = float(row[col]) if row[col] != '' else 0.0
-                except ValueError:
-                    value = 0.0  # Handle non-numeric values
-                if value < min_values[col]:
-                    min_values[col] = value
-                if value > max_values[col]:
-                    max_values[col] = value
+                    prefixes_announced_list = ast.literal_eval(prefixes_announced_str)
+                    if isinstance(prefixes_announced_list, list):
+                        for prefix in prefixes_announced_list:
+                            if isinstance(prefix, list):
+                                if len(prefix) == 1 and isinstance(prefix[0], str):
+                                    prefix = prefix[0]
+                                else:
+                                    print(f"Warning: Found a nested list in 'Target Prefixes Announced' at index {idx}. Skipping.")
+                                    continue
+                            if isinstance(prefix, str) and prefix.strip() != '0':
+                                prefix = prefix.strip()
+                                announcement = (
+                                    f"At {timestamp}, AS{as_number} announced the prefix: {prefix}. "
+                                    f"Total prefixes announced: {int(row['Total Prefixes Announced'])}."
+                                )
+                                prefix_announcements.append(announcement)
+                except (SyntaxError, ValueError):
+                    print(f"Warning: Could not parse 'Target Prefixes Announced' at index {idx}. Skipping.")
 
-            # Handle 'Prefixes Announced' and 'Prefixes Withdrawn' as counts
-            prefixes_announced_str = row.get('Prefixes Announced', '[]')
-            prefixes_withdrawn_str = row.get('Prefixes Withdrawn', '[]')
-            try:
-                prefixes_announced_list = ast.literal_eval(prefixes_announced_str)
-            except (SyntaxError, ValueError):
-                prefixes_announced_list = []
-            try:
-                prefixes_withdrawn_list = ast.literal_eval(prefixes_withdrawn_str)
-            except (SyntaxError, ValueError):
-                prefixes_withdrawn_list = []
-            num_prefixes_announced = len(prefixes_announced_list)
-            num_prefixes_withdrawn = len(prefixes_withdrawn_list)
-
-            # Update min and max for prefixes announced and withdrawn
-            for col, value in [('Prefixes Announced', num_prefixes_announced), ('Prefixes Withdrawn', num_prefixes_withdrawn)]:
-                if value < min_values.get(col, float('inf')):
-                    min_values[col] = value
-                if value > max_values.get(col, float('-inf')):
-                    max_values[col] = value
-
-            # Update prefix counters for frequent prefixes
-            prefix_announcement_counter.update(prefixes_announced_list)
-            prefix_withdrawal_counter.update(prefixes_withdrawn_list)
-
-            # Generate textual summary for each data point
-            data_point_summary = (
-                f"On {timestamp}, Autonomous System {as_number} observed {row['Announcements']} announcements. "
-                f"There were {row['New Routes']} new routes added. "
-                f"The total number of active routes was {row['Total Routes']}. "
-                f"The maximum path length observed was {row['Maximum Path Length']} hops, "
-                f"with an average path length of {row['Average Path Length']} hops. "
-                f"The maximum edit distance was {row['Maximum Edit Distance']}, "
-                f"with an average of {row['Average Edit Distance']}. "
-                f"The graph average degree was {row['Graph Average Degree']}. "
-                f"The graph betweenness centrality was {row['Graph Betweenness Centrality']}. "
-                f"The graph closeness centrality was {row['Graph Closeness Centrality']}. "
-                f"The graph eigenvector centrality was {row['Graph Eigenvector Centrality']}. "
-                f"The average MED was {row['Average MED']}. "
-                f"The average local preference was {row['Average Local Preference']}. "
-                f"There were {row['Total Communities']} total communities observed, "
-                f"with {row['Unique Communities']} unique communities. "
-                f"The number of unique peers was {row['Number of Unique Peers']}. "
-                f"The average prefix length was {row['Average Prefix Length']}, "
-                f"with a maximum of {row['Max Prefix Length']} and a minimum of {row['Min Prefix Length']}. "
-                f"Number of prefixes announced: {num_prefixes_announced}. "
-                f"Number of prefixes withdrawn: {num_prefixes_withdrawn}."
-            )
-            data_point_summaries.append(data_point_summary)
-
-            # Collect enriched prefix announcement information
-            if prefixes_announced_list:
-                prefixes_str = ', '.join(prefixes_announced_list)
-                announcement = (
-                    f"At {timestamp}, the following prefixes were announced by AS{as_number}: {prefixes_str}. "
-                    f"These prefixes contributed to a total of {num_prefixes_announced} announcements during this period."
-                )
-                prefix_announcements.append(announcement)
-
-            # Collect enriched prefix withdrawal information
-            if prefixes_withdrawn_list:
-                prefixes_str = ', '.join(prefixes_withdrawn_list)
-                withdrawal = (
-                    f"At {timestamp}, the following prefixes were withdrawn by AS{as_number}: {prefixes_str}. "
-                    f"These prefixes accounted for {num_prefixes_withdrawn} withdrawals during this period."
-                )
-                prefix_withdrawals.append(withdrawal)
-
-            # Collect updates per peer information and sum total updates per peer
-            updates_info = f"At {timestamp}, updates per peer were as follows:\n"
-            for peer_col in peer_columns:
-                peer_asn = peer_col.split('_')[1]
-                updates_str = row[peer_col]
+        # Collect prefix withdrawals
+        if row['Target Prefixes Withdrawn'] > 0:
+            prefixes_withdrawn_str = row.get('Target Prefixes Withdrawn', '0')
+            if isinstance(prefixes_withdrawn_str, str) and prefixes_withdrawn_str.strip() != '0':
                 try:
-                    updates = float(updates_str) if updates_str != '' else 0.0
-                except ValueError:
-                    updates = 0.0
-                total_updates_per_peer[peer_asn] += updates
-                updates_info += f"  Peer AS{peer_asn} had {updates} updates.\n"
-            updates_per_peer_info.append(updates_info)
+                    prefixes_withdrawn_list = ast.literal_eval(prefixes_withdrawn_str)
+                    if isinstance(prefixes_withdrawn_list, list):
+                        for prefix in prefixes_withdrawn_list:
+                            if isinstance(prefix, list):
+                                if len(prefix) == 1 and isinstance(prefix[0], str):
+                                    prefix = prefix[0]
+                                else:
+                                    print(f"Warning: Found a nested list in 'Target Prefixes Withdrawn' at index {idx}. Skipping.")
+                                    continue
+                            if isinstance(prefix, str) and prefix.strip() != '0':
+                                prefix = prefix.strip()
+                                withdrawal = (
+                                    f"At {timestamp}, AS{as_number} withdrew the prefix: {prefix}. "
+                                    f"Total prefixes withdrawn: {int(row['Target Prefixes Withdrawn'])}."
+                                )
+                                prefix_withdrawals.append(withdrawal)
+                except (SyntaxError, ValueError):
+                    print(f"Warning: Could not parse 'Target Prefixes Withdrawn' at index {idx}. Skipping.")
 
-        # Generate enriched overall summary
-        overall_summary_text = "Overall Summary:\n\n"
+        # Collect updates per peer information in narrative format
+        if peers:
+            updates_info = f"At {timestamp}, updates per peer were as follows:"
+            for peer_asn in peers:
+                if isinstance(peer_asn, str) and peer_asn.isdigit():
+                    updates = row['Average Updates per Peer']
+                    updates_info += f" Peer AS{peer_asn} received {updates:.2f} updates."
+            updates_per_peer_info.append(updates_info + "\n")
+        else:
+            updates_per_peer_info.append(f"At {timestamp}, no peer updates were observed.\n")
 
-        # Include min and max values with descriptions
-        overall_summary_text += "The following are the minimum and maximum values observed across various metrics:\n"
-        for col in numeric_columns + ['Prefixes Announced', 'Prefixes Withdrawn']:
-            min_val = min_values.get(col, 0.0)
-            max_val = max_values.get(col, 0.0)
-            overall_summary_text += (
-                f"- {col}: Minimum observed was {min_val}, and the maximum observed was {max_val}.\n"
+        # Detect Anomalies based on dynamic thresholds
+        anomalies_detected = []
+        unexpected_asns = []
+
+        # 1. High Withdrawals (Possible Leak or Outage)
+        if 'Withdrawals' in anomaly_thresholds and row['Withdrawals'] > anomaly_thresholds['Withdrawals']:
+            anomalies_detected.append("High Withdrawals detected (Possible Leak or Outage).")
+
+        # 2. High Announcements (Possible Hijack)
+        if 'Announcements' in anomaly_thresholds and row['Announcements'] > anomaly_thresholds['Announcements']:
+            anomalies_detected.append("High Announcements detected (Possible Hijack).")
+
+        # 3. Low Total Routes (Possible Outage)
+        if 'Total Routes' in anomaly_thresholds and row['Total Routes'] < anomaly_thresholds['Total Routes']:
+            anomalies_detected.append("Low Total Routes detected (Possible Outage).")
+
+        # 4. High Unexpected ASNs (Possible Hijack)
+        if 'Unexpected ASNs' in anomaly_thresholds and row['Count of Unexpected ASNs in Paths'] > anomaly_thresholds['Unexpected ASNs']:
+            anomalies_detected.append("High count of Unexpected ASNs in Paths detected (Possible Hijack).")
+            # Collect the unexpected ASNs
+            unexpected_asns = [
+                row.get('Unexpected ASN 1', 'N/A'),
+                row.get('Unexpected ASN 2', 'N/A'),
+                row.get('Unexpected ASN 3', 'N/A')
+            ]
+            # Convert to strings and strip whitespace
+            unexpected_asns = [str(asn).strip() for asn in unexpected_asns]
+            # Filter out 'N/A' and non-digit ASNs
+            unexpected_asns = [asn for asn in unexpected_asns if asn.isdigit()]
+
+        # Log Anomalies in narrative format with details
+        if anomalies_detected:
+            anomaly_log = (
+                f"On {timestamp}, Autonomous System {as_number} experienced the following anomalies:\n"
             )
+            for anomaly in anomalies_detected:
+                if "Unexpected ASNs" in anomaly:
+                    asns_str = ', '.join([f"AS{asn}" for asn in unexpected_asns]) if unexpected_asns else 'None'
+                    anomaly_log += f"  - {anomaly} (Count: {int(row['Count of Unexpected ASNs in Paths'])}, ASNs: {asns_str}).\n"
+                else:
+                    anomaly_log += f"  - {anomaly}\n"
+            anomaly_log += "\n"
 
-        # Add top peers by total updates with descriptive language
-        overall_summary_text += f"\nTop {top_n_peers} Peers with the Highest Number of Updates:\n"
-        # Sort the peers by total updates in descending order
-        sorted_peers = sorted(total_updates_per_peer.items(), key=lambda x: x[1], reverse=True)[:top_n_peers]
-        for rank, (peer_asn, total_updates) in enumerate(sorted_peers, start=1):
-            overall_summary_text += (
-                f"{rank}. Peer AS{peer_asn} had a total of {total_updates} updates, "
-                f"making it one of the most active peers.\n"
-            )
+            # Append explanation and detection methodology with actual values
+            for anomaly in anomalies_detected:
+                if "Hijack" in anomaly:
+                    explanation = anomaly_definitions['Hijacking']
+                    detection_method = anomaly_detection_methods['Hijacking'].format(
+                        threshold_announcements=anomaly_thresholds['Announcements'],
+                        observed_announcements=row['Announcements'],
+                        mean_announcements=means['Announcements'],
+                        std_announcements=std_devs['Announcements'],
+                        threshold_unexpected_asns=anomaly_thresholds['Unexpected ASNs'],
+                        observed_unexpected_asns=row['Count of Unexpected ASNs in Paths'],
+                        mean_unexpected_asns=means['Count of Unexpected ASNs in Paths'],
+                        std_unexpected_asns=std_devs['Count of Unexpected ASNs in Paths']
+                    )
+                    hijacking_anomalies.append(anomaly_log + f"Explanation: {explanation}\n\nDetection Methodology: {detection_method}\n\n")
+                elif "Leak" in anomaly:
+                    explanation = anomaly_definitions['Leaks']
+                    detection_method = anomaly_detection_methods['Leaks'].format(
+                        threshold_withdrawals=anomaly_thresholds['Withdrawals'],
+                        observed_withdrawals=row['Withdrawals'],
+                        mean_withdrawals=means['Withdrawals'],
+                        std_withdrawals=std_devs['Withdrawals']
+                    )
+                    leaks_anomalies.append(anomaly_log + f"Explanation: {explanation}\n\nDetection Methodology: {detection_method}\n\n")
+                elif "Outage" in anomaly:
+                    explanation = anomaly_definitions['Outages']
+                    detection_method = anomaly_detection_methods['Outages'].format(
+                        threshold_total_routes=anomaly_thresholds['Total Routes'],
+                        observed_total_routes=row['Total Routes'],
+                        mean_total_routes=means['Total Routes'],
+                        std_total_routes=std_devs['Total Routes']
+                    )
+                    outages_anomalies.append(anomaly_log + f"Explanation: {explanation}\n\nDetection Methodology: {detection_method}\n\n")
+                else:
+                    # If the anomaly doesn't fit specific categories, you can create a general log
+                    pass
 
-        # Add most frequent prefixes announced with descriptive language
-        overall_summary_text += f"\nTop {top_n_prefixes} Most Frequently Announced Prefixes:\n"
-        for rank, (prefix, count) in enumerate(prefix_announcement_counter.most_common(top_n_prefixes), start=1):
-            overall_summary_text += (
-                f"{rank}. Prefix {prefix} was announced {count} times, "
-                f"making it one of the most frequently announced prefixes.\n"
-            )
+    # Write Data Point Logs to File
+    with open(os.path.join(output_dir, data_point_logs_filename), 'w', encoding='utf-8') as f:
+        for log in data_point_logs:
+            f.write(log)
 
-        # Add most frequent prefixes withdrawn with descriptive language
-        overall_summary_text += f"\nTop {top_n_prefixes} Most Frequently Withdrawn Prefixes:\n"
-        for rank, (prefix, count) in enumerate(prefix_withdrawal_counter.most_common(top_n_prefixes), start=1):
-            overall_summary_text += (
-                f"{rank}. Prefix {prefix} was withdrawn {count} times, "
-                f"indicating significant routing changes.\n"
-            )
+    # Write Prefix Announcements to File in Narrative Format
+    with open(os.path.join(output_dir, prefix_announcements_filename), 'w', encoding='utf-8') as f:
+        for announcement in prefix_announcements:
+            f.write(announcement + "\n\n")
 
-        # Write the enriched overall summary to a text file
-        with open(os.path.join(output_dir, overall_summary_filename), 'w', encoding='utf-8') as f:
-            f.write(overall_summary_text)
+    # Write Prefix Withdrawals to File in Narrative Format
+    with open(os.path.join(output_dir, prefix_withdrawals_filename), 'w', encoding='utf-8') as f:
+        for withdrawal in prefix_withdrawals:
+            f.write(withdrawal + "\n\n")
 
-        # Write textual summaries of each data point to a text file
-        with open(os.path.join(output_dir, data_point_summaries_filename), 'w', encoding='utf-8') as f:
-            for summary in data_point_summaries:
-                f.write(summary + '\n\n')
+    # Write Updates per Peer to File in Narrative Format
+    with open(os.path.join(output_dir, updates_per_peer_filename), 'w', encoding='utf-8') as f:
+        for updates in updates_per_peer_info:
+            f.write(updates + "\n")
 
-        # Write enriched prefix announcement information to a text file
-        with open(os.path.join(output_dir, prefix_announcements_filename), 'w', encoding='utf-8') as f:
-            for announcement in prefix_announcements:
-                f.write(announcement + '\n\n')
+    # Write Anomaly Logs to Files in Narrative Format with Explanations and Detection Methodologies
+    with open(os.path.join(output_dir, hijacking_filename), 'w', encoding='utf-8') as f:
+        for log in hijacking_anomalies:
+            f.write(log)
 
-        # Write enriched prefix withdrawal information to a text file
-        with open(os.path.join(output_dir, prefix_withdrawals_filename), 'w', encoding='utf-8') as f:
-            for withdrawal in prefix_withdrawals:
-                f.write(withdrawal + '\n\n')
+    with open(os.path.join(output_dir, leaks_filename), 'w', encoding='utf-8') as f:
+        for log in leaks_anomalies:
+            f.write(log)
 
-        # Write enriched updates per peer information to a text file
-        with open(os.path.join(output_dir, updates_per_peer_filename), 'w', encoding='utf-8') as f:
-            for updates in updates_per_peer_info:
-                f.write(updates + '\n')
+    with open(os.path.join(output_dir, outages_filename), 'w', encoding='utf-8') as f:
+        for log in outages_anomalies:
+            f.write(log)
 
-        print(f"Data processing complete. Output files are saved in the '{output_dir}' directory.")
+    # Generate Anomaly Summary in Narrative Format
+    anomaly_summary = "Anomaly Summary:\n\n"
+    total_anomalies = len(hijacking_anomalies) + len(leaks_anomalies) + len(outages_anomalies)
+    if total_anomalies > 0:
+        anomaly_summary += f"During the observation period, a total of {total_anomalies} anomalies were detected across various Autonomous Systems.\n\n"
+        anomaly_summary += f"- Hijacking Anomalies: {len(hijacking_anomalies)} detected.\n"
+        anomaly_summary += f"- Leaks Anomalies: {len(leaks_anomalies)} detected.\n"
+        anomaly_summary += f"- Outages Anomalies: {len(outages_anomalies)} detected.\n\n"
+        anomaly_summary += "Each anomaly has been documented with detailed explanations and detection methodologies, including the actual observed values, mean, standard deviations, and thresholds used to identify the anomalies."
+    else:
+        anomaly_summary += "No anomalies were detected during the observation period.\n"
 
-
-def df_to_document_list(df, output=None):
-    """
-    Convert a DataFrame into a list of plain text descriptions suitable for embedding models.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame to convert.
-    output (str, optional): The path to save the output text file containing all documents.
-
-    Returns:
-    List[str]: A list of plain text descriptions of the DataFrame content.
-    """
-    documents = []
-
-    for index, row in df.iterrows():
-        row_description = f"At {row['Timestamp']}, AS{row['Autonomous System Number']} observed {row['Announcements']} announcements"
+    with open(os.path.join(output_dir, anomaly_summary_filename), 'w', encoding='utf-8') as f:
+        f.write(anomaly_summary)
         
-        if 'Withdrawals' in df.columns and row['Withdrawals'] > 0:
-            row_description += f" and {row['Withdrawals']} withdrawals"
-        
-        if 'New Routes' in df.columns and row['New Routes'] > 0:
-            row_description += f". There were {row['New Routes']} new routes added"
-        
-        if 'Origin Changes' in df.columns and row['Origin Changes'] > 0:
-            row_description += f", with {row['Origin Changes']} origin changes"
-        
-        if 'Route Changes' in df.columns and row['Route Changes'] > 0:
-            row_description += f" and {row['Route Changes']} route changes"
-        
-        if 'Total Routes' in df.columns:
-            row_description += f". A total of {row['Total Routes']} routes were active"
-
-        if 'Maximum Path Length' in df.columns:
-            row_description += f", with a maximum path length of {row['Maximum Path Length']}"
-        
-        if 'Average Path Length' in df.columns:
-            row_description += f" and an average path length of {row['Average Path Length']}"
-        
-        if 'Maximum Edit Distance' in df.columns:
-            row_description += f". The maximum edit distance observed was {row['Maximum Edit Distance']}"
-        
-        if 'Average Edit Distance' in df.columns:
-            row_description += f" with an average edit distance of {row['Average Edit Distance']}"
-        
-        if 'Unique Prefixes Announced' in df.columns:
-            row_description += f". There were {row['Unique Prefixes Announced']} unique prefixes announced"
-
-        # Add graph-related features if available
-        if 'Graph Average Degree' in df.columns:
-            row_description += f". The graph's average degree was {row['Graph Average Degree']}"
-        
-        if 'Graph Betweenness Centrality' in df.columns:
-            row_description += f", betweenness centrality was {row['Graph Betweenness Centrality']}"
-        
-        if 'Graph Closeness Centrality' in df.columns:
-            row_description += f", closeness centrality was {row['Graph Closeness Centrality']}"
-        
-        if 'Graph Eigenvector Centrality' in df.columns:
-            row_description += f", and eigenvector centrality was {row['Graph Eigenvector Centrality']}"
-        
-        row_description += "."
-        documents.append(row_description)
-    
-    # Optionally save all documents to a single text file
-    if output:
-        os.makedirs(os.path.dirname(output), exist_ok=True)
-        with open(output, "w", encoding="utf-8") as file:
-            for doc in documents:
-                file.write(doc + "\n\n")
-                    
-    return documents
+    print(f"Data processing complete. Output files are saved in the '{output_dir}' directory.")
 
 
 def new_df_to_narrative_2(df, output=None):
