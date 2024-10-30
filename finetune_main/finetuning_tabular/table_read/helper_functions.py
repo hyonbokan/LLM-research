@@ -11,16 +11,8 @@ anomaly_rules_config = [
         'type': 'Leak Anomaly',
         'description': "Excessive route withdrawals or unexpected route advertisements indicating possible route leaks.",
         'conditions': [
-            {
-                'feature': 'Withdrawals',
-                'operator': '>',
-                'threshold': None  # To be assigned dynamically based on percentile
-            },
-            {
-                'feature': 'Route Changes',
-                'operator': '>',
-                'threshold': None  # To be assigned dynamically based on percentile
-            }
+            {'feature': 'Withdrawals', 'operator': '>', 'threshold': None},
+            {'feature': 'Route Changes', 'operator': '>', 'threshold': None}
         ]
     },
     # Flapping Anomaly
@@ -28,16 +20,8 @@ anomaly_rules_config = [
         'type': 'Flapping Anomaly',
         'description': "Frequent changes in route announcements and withdrawals, indicating network instability.",
         'conditions': [
-            {
-                'feature': 'Std Dev of Updates',
-                'operator': '>',
-                'threshold': None
-            },
-            {
-                'feature': 'Announcements',
-                'operator': '>',
-                'threshold': None
-            }
+            {'feature': 'Std Dev of Updates', 'operator': '>', 'threshold': None},
+            {'feature': 'Announcements', 'operator': '>', 'threshold': None}
         ]
     },
     # Hijack Anomaly
@@ -45,11 +29,7 @@ anomaly_rules_config = [
         'type': 'Hijack Anomaly',
         'description': "Unauthorized ASNs appearing in the AS path, indicating potential route hijacking.",
         'conditions': [
-            {
-                'feature': 'Count of Unexpected ASNs in Paths',
-                'operator': '>',
-                'threshold': None
-            }
+            {'feature': 'Count of Unexpected ASNs in Paths', 'operator': '>', 'threshold': None}
         ]
     },
     # Path Manipulation Anomaly
@@ -57,16 +37,8 @@ anomaly_rules_config = [
         'type': 'Path Manipulation Anomaly',
         'description': "Unusual modifications to the AS path, such as excessive AS path prepending.",
         'conditions': [
-            {
-                'feature': 'AS Path Prepending',
-                'operator': '>',
-                'threshold': None
-            },
-            {
-                'feature': 'Maximum Path Length',
-                'operator': '>',
-                'threshold': None
-            }
+            {'feature': 'AS Path Prepending', 'operator': '>', 'threshold': None},
+            {'feature': 'Maximum Path Length', 'operator': '>', 'threshold': None}
         ]
     },
     # Policy-Related Anomaly
@@ -74,16 +46,8 @@ anomaly_rules_config = [
         'type': 'Policy-Related Anomaly',
         'description': "Deviations from defined routing policies, such as unexpected MED or Local Preference values.",
         'conditions': [
-            {
-                'feature': 'Average MED',
-                'operator': '>',
-                'threshold': None
-            },
-            {
-                'feature': 'Average Local Preference',
-                'operator': '<',
-                'threshold': None
-            }
+            {'feature': 'Average MED', 'operator': '>', 'threshold': None},
+            {'feature': 'Average Local Preference', 'operator': '<', 'threshold': None}
         ]
     },
     # Add more anomaly categories and their conditions as needed
@@ -99,8 +63,10 @@ def process_list_column(df, column_list, default_value):
             logging.warning(f"Column '{col}' not found in the DataFrame. Filling with default.")
             df[col] = [default_value for _ in range(len(df))]
 
-def generate_overall_summary(df, summary_metrics, total_updates_per_peer, total_updates_per_prefix, top_n_peers):
-    overall_summary_text = "BGP monitoring overview:\n\n"
+def generate_overall_summary(df, summary_metrics, total_updates_per_peer, total_updates_per_prefix,
+                            total_announcements_per_peer, total_announcements_per_prefix):
+    overall_summary_text = "BGP Monitoring Overview:\n\n"
+    
     # Key statistics
     overall_summary_text += (
         f"During the observation period, Autonomous Systems reported various BGP metrics. "
@@ -119,32 +85,75 @@ def generate_overall_summary(df, summary_metrics, total_updates_per_peer, total_
     )
     overall_summary_text += "\n\n"
 
-    # Top peers
+    # **All Peers Summary**
+    total_peers = df['All Peers'].explode().dropna().unique()
+    num_peers = len(total_peers)
+    overall_summary_text += f"Total Number of Unique Peers Observed: {num_peers}\n"
+    if num_peers > 0:
+        peers_list = ', '.join([f"AS{asn}" for asn in total_peers])
+        overall_summary_text += f"List of Peers: {peers_list}\n"
+    else:
+        overall_summary_text += "No peer data available.\n"
+
+    overall_summary_text += "\n"
+
+    # **Total and Average Updates per Peer**
+    overall_summary_text += (
+        f"Total Updates across all peers: {int(sum(total_updates_per_peer.values()))}\n"
+        f"Average Updates per Peer: {sum(total_updates_per_peer.values()) / len(total_updates_per_peer) if total_updates_per_peer else 0:.2f}\n"
+    )
+    overall_summary_text += "\n"
+
+    # **Top Peers with Most Updates**
+    top_n_peers = 5
     overall_summary_text += f"Top {top_n_peers} Peers with the Highest Number of Updates:\n"
     sorted_peers = sorted(total_updates_per_peer.items(), key=lambda x: x[1], reverse=True)[:top_n_peers]
-    if sorted_peers:
-        peer_details = ', '.join([f"AS{asn}" for asn, _ in sorted_peers])
-        overall_summary_text += (
-            f"The top {top_n_peers} peers contributing the most updates are {peer_details}.\n"
-        )
+    if sorted_peers and any(updates > 0 for _, updates in sorted_peers):
+        for asn, updates in sorted_peers:
+            if updates > 0:
+                overall_summary_text += f" - AS{asn}: {int(updates)} updates\n"
+            else:
+                overall_summary_text += f" - AS{asn}: {int(updates)} updates (No updates recorded)\n"
     else:
         overall_summary_text += "No peer updates data available.\n"
 
     overall_summary_text += "\n"
-    
-    # Top prefixes
-    top_n_prefixes = 5  # Adjust as needed
+
+    # **Top Prefixes with Most Updates**
+    top_n_prefixes = 5
     overall_summary_text += f"Top {top_n_prefixes} Prefixes with the Highest Number of Updates:\n"
     sorted_prefixes = sorted(total_updates_per_prefix.items(), key=lambda x: x[1], reverse=True)[:top_n_prefixes]
-    if sorted_prefixes:
+    if sorted_prefixes and any(updates > 0 for _, updates in sorted_prefixes):
         for prefix, updates in sorted_prefixes:
-            overall_summary_text += f" - Prefix {prefix}\n"
+            overall_summary_text += f" - Prefix {prefix}: {int(updates)} updates\n"
     else:
         overall_summary_text += "No prefix updates data available.\n"
 
     overall_summary_text += "\n"
-    
-    # Policy-Related Metrics Summary
+
+    # **Top Announced Peers**
+    overall_summary_text += f"Top {top_n_peers} Peers with the Highest Number of Announcements:\n"
+    sorted_announced_peers = sorted(total_announcements_per_peer.items(), key=lambda x: x[1], reverse=True)[:top_n_peers]
+    if sorted_announced_peers:
+        for asn, announcements in sorted_announced_peers:
+            overall_summary_text += f" - AS{asn}: {int(announcements)} announcements\n"
+    else:
+        overall_summary_text += "No peer announcements data available.\n"
+
+    overall_summary_text += "\n"
+
+    # **Top Announced Prefixes**
+    overall_summary_text += f"Top {top_n_prefixes} Prefixes with the Highest Number of Announcements:\n"
+    sorted_announced_prefixes = sorted(total_announcements_per_prefix.items(), key=lambda x: x[1], reverse=True)[:top_n_prefixes]
+    if sorted_announced_prefixes:
+        for prefix, announcements in sorted_announced_prefixes:
+            overall_summary_text += f" - Prefix {prefix}: {int(announcements)} announcements\n"
+    else:
+        overall_summary_text += "No prefix announcements data available.\n"
+
+    overall_summary_text += "\n"
+
+    # **Policy-Related Metrics Summary**
     overall_summary_text += "Policy-Related Metrics Summary:\n\n"
     # Local Preference Summary
     overall_summary_text += (
@@ -170,7 +179,6 @@ def generate_overall_summary(df, summary_metrics, total_updates_per_peer, total_
 
     return overall_summary_text
 
-
 def generate_as_path_changes_summary(df, output_dir, as_path_changes_summary_filename):
     try:
         summary = "AS Path Changes Summary Report\n"
@@ -178,7 +186,7 @@ def generate_as_path_changes_summary(df, output_dir, as_path_changes_summary_fil
 
         # Ensure 'AS Path Changes' and 'Autonomous System Number' columns exist
         missing_columns = []
-        for col in ['AS Path Changes', 'Autonomous System Number']:
+        for col in ['AS Path Changes', 'Autonomous System Number', 'All Paths']:
             if col not in df.columns:
                 missing_columns.append(col)
 
@@ -202,7 +210,6 @@ def generate_as_path_changes_summary(df, output_dir, as_path_changes_summary_fil
 
         summary += "Top ASNs with Most AS Path Changes:\n"
         if not top_asns.empty:
-            # Use .items() instead of .iteritems()
             for asn, changes in top_asns.items():
                 summary += f" - AS{asn}: {int(changes)} changes\n"
         else:
@@ -210,14 +217,30 @@ def generate_as_path_changes_summary(df, output_dir, as_path_changes_summary_fil
 
         summary += "\n"
 
-        # Optional: Include percentage contribution of top ASNs
-        if total_changes > 0 and not top_asns.empty:
-            summary += "Percentage Contribution of Top ASNs:\n"
-            for asn, changes in top_asns.items():
-                percentage = (changes / total_changes) * 100
-                summary += f" - AS{asn}: {percentage:.2f}% of total changes\n"
-            summary += "\n"
-            
+        # **List All AS Paths Involved in Changes**
+        # Extract all AS paths from the 'All Paths' column
+        all_paths = df['All Paths'].explode().dropna().unique()
+        summary += "List of All AS Paths Involved in Changes:\n"
+        for path in all_paths:
+            summary += f" - {path}\n"
+
+        summary += "\n"
+
+        # **Identify and List the Most Frequent AS Paths**
+        # Flatten all paths and count their frequencies
+        all_paths_flat = df['All Paths'].explode().dropna()
+        path_frequencies = all_paths_flat.value_counts()
+        most_frequent_paths = path_frequencies.head(5)
+
+        summary += "Top 5 Most Frequent AS Paths:\n"
+        if not most_frequent_paths.empty:
+            for path, freq in most_frequent_paths.items():
+                summary += f" - Path: {path} | Frequency: {int(freq)}\n"
+        else:
+            summary += "No AS path data available to determine frequencies.\n"
+
+        summary += "\n"
+
         # Write summary to file
         summary_file_path = os.path.join(output_dir, as_path_changes_summary_filename)
         with open(summary_file_path, 'w', encoding='utf-8') as f:
@@ -267,7 +290,7 @@ def collect_prefix_events(row, idx, timestamp, as_number, prefix_announcements, 
             )
             prefix_withdrawals.append(withdrawal)
             total_updates_per_prefix[prefix] += 1
-            
+
 
 def parse_prefix_list(prefixes_str, idx, column_name):
     prefixes_list = []
@@ -288,70 +311,33 @@ def parse_prefix_list(prefixes_str, idx, column_name):
             logging.warning(f"Could not parse '{column_name}' at index {idx}. Skipping.")
     return prefixes_list
 
-
-# def generate_updates_per_peer_info(row, timestamp, peer_asns):
-#     updates_info = f"At {timestamp}, updates per peer were as follows:\n"
-    
-#     if peer_asns:
-#         for peer_asn in peer_asns:
-#             if peer_asn.isdigit():
-#                 updates = row.get('Average Updates per Peer', 0.0)
-#                 updates_info += f"  - AS{peer_asn}: {updates} updates\n"
-#     else:
-#         updates_info += "  No peer updates were observed.\n"
-    
-#     return updates_info
-
-def generate_updates_per_peer_info(row, timestamp, peer_asns):
-    # Retrieve the average updates per peer for all peers combined
-    avg_updates = row.get('Average Updates per Peer', 0.0)
-    updates_info = f"At {timestamp}, the average updates per peer were {avg_updates:.2f}, and the top peers are as follows:\n"
-    
+def generate_updates_per_peer_info(timestamp, peer_asns, total_updates_per_peer):
     if peer_asns:
-        for peer_asn in peer_asns:
-            if peer_asn.isdigit():
-                updates_info += f"  - AS{peer_asn}\n"
+        updates_info = f"Peer Updates Information at {timestamp}:\n"
+        for asn in peer_asns:
+            updates = total_updates_per_peer.get(asn, 0)
+            updates_info += f"  - AS{asn}: {int(updates)} updates\n"
     else:
-        updates_info += "  No top peers were observed.\n"
+        updates_info = f"Peer Updates Information at {timestamp}: No peer updates information available.\n"
     
     return updates_info
-
-# def generate_updates_per_prefix_info(timestamp, top_prefixes, prefix_updates):
-#     updates_info = f"At {timestamp}, updates per top prefix were as follows:\n"
-
-#     prefixes_present = False
-#     if top_prefixes:
-#         for prefix, updates in zip(top_prefixes, prefix_updates):
-#             if prefix:
-#                 updates_info += f"  - Prefix {prefix}\n"
-#                 prefixes_present = True
-#     if not prefixes_present:
-#         updates_info += "  - Prefix: None\n"
-
-#     return updates_info
 
 def generate_updates_per_prefix_info(timestamp, top_prefixes, prefix_updates):
     updates_info = f"At {timestamp}, updates per top prefix were as follows:\n"
-
-    prefixes_present = False
-    if top_prefixes:
+    
+    if top_prefixes and prefix_updates:
         for prefix, updates in zip(top_prefixes, prefix_updates):
-            # Check if the prefix is zero, and if so, display "None" instead
-            prefix_display = prefix if prefix != '0' else 'None'
-            if prefix_display != 'None':
-                updates_info += f"  - Prefix {prefix_display}\n"
-                prefixes_present = True
+            if prefix:  # Ensure prefix is not empty
+                updates_info += f"  - Prefix {prefix}: {int(updates)} updates\n"
             else:
                 updates_info += "  - Prefix: None\n"
-
-    if not prefixes_present:
-        updates_info += "  - Prefix: None\n"
-
+    else:
+        updates_info += "  - No prefixes available.\n"
+    
     return updates_info
 
 
-
-def detect_anomalies(row, anomaly_rules, require_all_conditions=False):
+def detect_anomalies(row, anomaly_rules, require_all_conditions=True):
     operators_map = {
         '>': operator.gt,
         '<': operator.lt,
@@ -379,8 +365,8 @@ def detect_anomalies(row, anomaly_rules, require_all_conditions=False):
 
         for condition in conditions:
             feature = condition['feature']
-            threshold = condition['threshold']
             operator_str = condition['operator']
+            threshold = condition['threshold']
 
             # Get the operator function
             op_func = operators_map.get(operator_str)
@@ -394,7 +380,7 @@ def detect_anomalies(row, anomaly_rules, require_all_conditions=False):
                 # If feature is missing, skip this condition
                 logging.warning(f"Feature '{feature}' not found in the data row. Skipping condition.")
                 continue
-            
+
             logging.debug(f"Evaluating anomaly condition for feature '{feature}': value={feature_value}, threshold={threshold}")
 
             # Apply the operator to compare feature value and threshold
@@ -408,21 +394,6 @@ def detect_anomalies(row, anomaly_rules, require_all_conditions=False):
                 if require_all_conditions:
                     conditions_met = False
                     break
-
-        # Additional logic to capture all unexpected ASNs in the row for Hijack Anomaly
-        if conditions_met and anomaly_type == 'Hijack Anomaly':
-            unexpected_asns = []
-            # Assuming up to 3 unexpected ASN columns; adjust range if more ASNs are possible
-            for i in range(1, 4):
-                asn_col = f'Unexpected ASN {i}'
-                asn = row.get(asn_col)
-                if pd.notnull(asn) and asn != 0:
-                    try:
-                        unexpected_asns.append(int(asn))
-                    except ValueError:
-                        logging.warning(f"Invalid ASN value '{asn}' in column '{asn_col}'. Skipping.")
-            if unexpected_asns:
-                details['unexpected_asns_in_paths'] = unexpected_asns
 
         if conditions_met and triggered_features:
             anomalies_detected.append({
