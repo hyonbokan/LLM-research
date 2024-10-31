@@ -125,21 +125,15 @@ features_numeric = {
     "Total Prefixes Withdrawn List"
 }
 
-# Current numeric_columns set
 numeric_columns_set = set(numeric_columns)
 
-# Identify missing columns
 missing_in_numeric = features_numeric - numeric_columns_set
 extra_in_numeric = numeric_columns_set - features_numeric
 
 if missing_in_numeric:
     logger.warning(f"The following numeric features are missing in 'numeric_columns': {missing_in_numeric}")
-    # Optionally, you can automate adding them
-    # numeric_columns.extend(list(missing_in_numeric))
 if extra_in_numeric:
     logger.warning(f"The following columns in 'numeric_columns' are not defined in 'features': {extra_in_numeric}")
-    # Optionally, you can remove them
-    # numeric_columns = [col for col in numeric_columns if col not in extra_in_numeric]
 if not missing_in_numeric and not extra_in_numeric:
     logger.info("All numeric features in 'features' are correctly included in 'numeric_columns'.")
     
@@ -153,6 +147,29 @@ def safe_parse_list(x, column_name, idx):
         logging.warning(f"Failed to parse list from '{column_name}' at row {idx}. Filling with empty list.")
         return []
 
+def safe_parse_peer_updates(x, column_name, idx):
+    try:
+        if isinstance(x, dict):
+            return x
+        elif isinstance(x, str):
+            # Attempt to parse as a dictionary string
+            parsed = ast.literal_eval(x)
+            if isinstance(parsed, dict):
+                return parsed
+            else:
+                logging.warning(f"Parsed '{column_name}' at row {idx} is not a dict.")
+                return {}
+        elif isinstance(x, list):
+            # Convert list of tuples/lists to dict
+            return dict(x)
+        else:
+            logging.warning(f"Unsupported format for '{column_name}' at row {idx}.")
+            return {}
+    except (ValueError, SyntaxError) as e:
+        logging.warning(f"Failed to parse '{column_name}' at row {idx}: {e}. Filling with empty dict.")
+        return {}
+
+    
 def process_bgp(
     df,
     output_dir='processed_output',
@@ -188,6 +205,7 @@ def process_bgp(
     for col in list_columns:
         if col in df.columns:
             df[col] = df.apply(lambda row: safe_parse_list(row[col], col, row.name), axis=1)
+            logger.info(f"Parsed column '{col}' as lists.")
         else:
             logger.warning(f"Column '{col}' not found in the DataFrame. Filling with empty lists.")
             df[col] = [[] for _ in range(len(df))]
@@ -245,7 +263,7 @@ def process_bgp(
     logger.info(f"Defined {len(anomaly_rules)} anomaly rules.")
 
     # Calculate total updates per peer and prefix
-    total_updates_per_peer = defaultdict(int)
+    total_updates_per_peer = defaultdict(int)  # Changed to int if updates are counts
     total_updates_per_prefix = defaultdict(int)
 
     # Additional data structures to track announcements
@@ -255,6 +273,7 @@ def process_bgp(
     if 'Average Updates per Prefix' not in df.columns:
         df['Average Updates per Prefix'] = df['Total Updates'] / df['Total Prefixes Announced']
         df['Average Updates per Prefix'] = df['Average Updates per Prefix'].fillna(0.0)
+        logger.info("Calculated 'Average Updates per Prefix'.")
 
     # Initialize logs and lists
     data_point_logs = []
@@ -274,66 +293,64 @@ def process_bgp(
             # Generate data point log
             log_entry = generate_data_point_log(row, timestamp, as_number)
             data_point_logs.append(log_entry + "\n")
+            logger.debug(f"Row {idx}: Data point log added.")
 
             # Collect prefix announcements and withdrawals
             collect_prefix_events(
                 row, idx, timestamp, as_number,
                 prefix_announcements, prefix_withdrawals,
-                total_updates_per_prefix,
+                total_updates_per_prefix, logger
             )
 
             # Extract ASN values from 'All Peers' column
             peers_list = row.get('All Peers', [])
             peer_asns = [str(asn) for asn in peers_list if isinstance(asn, (int, str)) and str(asn).isdigit()]
 
-            # **Update total_updates_per_peer here based on actual updates**
-            peer_updates = row.get('Peer Updates', {})
-            if isinstance(peer_updates, dict):
-                for asn, updates in peer_updates.items():
+            # **Parse and Update 'Peer Updates'**
+            peer_updates_raw = row.get('Peer Updates', {})
+            parsed_peer_updates = safe_parse_peer_updates(peer_updates_raw, 'Peer Updates', idx)
+            if parsed_peer_updates:
+                for asn, updates in parsed_peer_updates.items():
                     try:
                         asn_str = str(asn)
                         updates_int = int(updates)
                         total_updates_per_peer[asn_str] += updates_int
-                        logger.debug(f"Updated AS{asn_str} with {updates_int} updates. Total now: {total_updates_per_peer[asn_str]}")
+                        logger.debug(f"Row {idx}: Updated AS{asn_str} with {updates_int} updates. Total now: {total_updates_per_peer[asn_str]}")
                     except (ValueError, TypeError):
-                        logger.warning(f"Invalid update count for AS{asn} at row {idx}. Skipping.")
+                        logger.warning(f"Row {idx}: Invalid update count for AS{asn} at row {idx}. Skipping.")
             else:
-                # If 'Peer Updates' column does not exist, consider incrementing by 1 per occurrence
-                for asn in peer_asns:
-                    total_updates_per_peer[asn] += 1  # Increment by 1 per occurrence
-                    logger.debug(f"Incremented AS{asn} updates by 1. Total now: {total_updates_per_peer[asn]}")
+                # If 'Peer Updates' could not be parsed, increment by 1 per occurrence
+                if peer_asns:
+                    for asn in peer_asns:
+                        total_updates_per_peer[asn] += 1  # Increment by 1 per occurrence
+                        logger.debug(f"Row {idx}: Incremented AS{asn} updates by 1. Total now: {total_updates_per_peer[asn]}")
+                else:
+                    logger.debug(f"Row {idx}: No peers found to update.")
 
             # Track announcements per peer
             announcements_count = row.get('Announcements', 0)
             for asn in peer_asns:
                 total_announcements_per_peer[asn] += announcements_count
-                logger.debug(f"AS{asn} made {announcements_count} announcements. Total now: {total_announcements_per_peer[asn]}")
+                logger.debug(f"Row {idx}: AS{asn} made {announcements_count} announcements. Total now: {total_announcements_per_peer[asn]}")
 
             # Generate updates per peer information with timestamp
             updates_info = generate_updates_per_peer_info(timestamp, peer_asns, total_updates_per_peer)
             updates_per_peer_info.append(updates_info + "\n")
+            logger.debug(f"Row {idx}: Updates per peer info added.")
 
             # Extract Top Prefixes
             top_prefixes = row.get('All Prefixes Announced', [])
             prefix_updates_list = [total_updates_per_prefix.get(prefix, 0) for prefix in top_prefixes]
             logger.debug(f"Row {idx}: Top Prefixes: {top_prefixes}")
-            logger.debug(f"Row {idx}: Prefix Updates: {prefix_updates_list}")
-
-            # Accumulate updates per prefix
-            for prefix, updates in zip(top_prefixes, prefix_updates_list):
-                if prefix:
-                    total_updates_per_prefix[prefix] += updates
-                    logger.debug(f"Accumulated {updates} updates for Prefix {prefix}. Total so far: {total_updates_per_prefix[prefix]}")
-                else:
-                    logger.debug(f"Encountered empty prefix at row {idx}.")
+            logger.debug(f"Row {idx}: Prefix Updates List: {prefix_updates_list}")
 
             # Track announcements per prefix
             for prefix in top_prefixes:
                 if prefix:
                     total_announcements_per_prefix[prefix] += 1  # Increment by 1 per announcement
-                    logger.debug(f"Prefix {prefix} announced. Total announcements: {total_announcements_per_prefix[prefix]}")
+                    logger.debug(f"Row {idx}: Prefix {prefix} announced. Total announcements: {total_announcements_per_prefix[prefix]}")
                 else:
-                    logger.debug(f"Empty prefix encountered in announcements at row {idx}.")
+                    logger.debug(f"Row {idx}: Empty prefix encountered in announcements.")
 
             # Generate updates per prefix information
             updates_prefix_info = generate_updates_per_prefix_info(timestamp, top_prefixes, prefix_updates_list)
@@ -353,7 +370,7 @@ def process_bgp(
                         'details': anomaly['details']
                     }
                     anomalies.append(anomaly_entry)
-                    logger.info(f"Anomaly detected: {anomaly_entry}")
+                    logger.info(f"Row {idx}: Anomaly detected: {anomaly_entry}")
 
             # Collect policy-related information
             policy_info = collect_policy_info(row)
@@ -363,42 +380,53 @@ def process_bgp(
                 logger.debug(f"Row {idx}: Policy info added.")
 
         except Exception as e:
-            logger.error(f"Error processing row {idx}: {e}")
+            logger.error(f"Row {idx}: Error processing row: {e}")
             continue
 
-    # Write logs to files
+    # **Write logs to files**
     write_logs_to_file(data_point_logs, output_dir, data_point_logs_filename)
     write_logs_to_file(prefix_announcements, output_dir, prefix_announcements_filename)
     write_logs_to_file(prefix_withdrawals, output_dir, prefix_withdrawals_filename)
     write_logs_to_file(updates_per_peer_info, output_dir, updates_per_peer_filename)
     write_logs_to_file(updates_per_prefix_info, output_dir, updates_per_prefix_filename)
-    
-    # Generate Overall Summary
+    logger.info("Finished writing logs to files.")
+
+    # **Log the total updates per prefix for verification**
+    logger.info("Total Updates per Prefix:")
+    for prefix, updates in total_updates_per_prefix.items():
+        logger.info(f"Prefix {prefix}: {updates} updates")
+
+    # **Generate Overall Summary once**
     overall_summary_text = generate_overall_summary(
         df, summary_metrics, total_updates_per_peer,
         total_updates_per_prefix, total_announcements_per_peer,
         total_announcements_per_prefix
     )
 
-    # Write Overall Summary to File
+    # **Write Overall Summary to File once using 'w' mode to overwrite**
     with open(os.path.join(output_dir, overall_summary_filename), 'w', encoding='utf-8') as f:
         f.write(overall_summary_text)
+    logger.info(f"Wrote overall summary to '{overall_summary_filename}'.")
 
-    # Write detailed anomaly logs
+    # **Write detailed anomaly logs**
     with open(os.path.join(output_dir, anomalies_filename), 'w', encoding='utf-8') as f:
         for anomaly in anomalies:
             anomaly_log = generate_anomaly_log(anomaly, anomaly['timestamp'], anomaly['as_number'])
             f.write(anomaly_log)
+    logger.info(f"Wrote detailed anomalies to '{anomalies_filename}'.")
 
-    # Write anomaly summary
+    # **Write anomaly summary**
     generate_and_write_anomaly_summary(anomalies, output_dir, anomaly_summary_filename)
+    logger.info(f"Wrote anomaly summary to '{anomaly_summary_filename}'.")
 
-    # Write AS path changes summary
+    # **Write AS path changes summary**
     generate_as_path_changes_summary(df, output_dir, as_path_changes_summary_filename)
+    logger.info(f"Wrote AS path changes summary to '{as_path_changes_summary_filename}'.")
 
-    # Write policy summary
+    # **Write policy summary**
     policy_summary_text = generate_policy_summary(df, summary_metrics)
-    with open(os.path.join(output_dir, policy_summary_filename), 'w', encoding='utf-8') as f:
+    with open(os.path.join(output_dir, policy_summary_filename), 'a', encoding='utf-8') as f:
         f.write(policy_summary_text)
+    logger.info(f"Wrote policy summary to '{policy_summary_filename}'.")
 
     print(f"Data processing complete. Output files are saved in the '{output_dir}' directory.")

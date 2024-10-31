@@ -5,6 +5,9 @@ from collections import defaultdict, Counter
 import logging
 import operator
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 anomaly_rules_config = [
     # Leak Anomaly
     {
@@ -98,9 +101,11 @@ def generate_overall_summary(df, summary_metrics, total_updates_per_peer, total_
     overall_summary_text += "\n"
 
     # **Total and Average Updates per Peer**
+    total_updates = sum(total_updates_per_peer.values())
+    average_updates = total_updates / len(total_updates_per_peer) if total_updates_per_peer else 0
     overall_summary_text += (
-        f"Total Updates across all peers: {int(sum(total_updates_per_peer.values()))}\n"
-        f"Average Updates per Peer: {sum(total_updates_per_peer.values()) / len(total_updates_per_peer) if total_updates_per_peer else 0:.2f}\n"
+        f"Total Updates across all peers: {int(total_updates)}\n"
+        f"Average Updates per Peer: {average_updates:.2f}\n"
     )
     overall_summary_text += "\n"
 
@@ -265,32 +270,36 @@ def generate_data_point_log(row, timestamp, as_number):
     )
     return log_entry
 
-def collect_prefix_events(row, idx, timestamp, as_number, prefix_announcements, prefix_withdrawals, total_updates_per_prefix):
+def collect_prefix_events(row, idx, timestamp, as_number, prefix_announcements, prefix_withdrawals, total_updates_per_prefix, logger):
     # Announcements
     total_prefixes_announced = row.get('Total Prefixes Announced', 0)
     if total_prefixes_announced > 0:
         prefixes_announced_str = row.get('Target Prefixes Announced', '[]')
         prefixes_announced_list = parse_prefix_list(prefixes_announced_str, idx, 'Target Prefixes Announced')
+        logger.debug(f"Row {idx}: Prefixes Announced: {prefixes_announced_list}")
         for prefix in prefixes_announced_list:
             announcement = (
                 f"At {timestamp}, AS{as_number} announced the prefix: {prefix}. "
                 f"Total prefixes announced: {int(total_prefixes_announced)}."
             )
             prefix_announcements.append(announcement)
-            total_updates_per_prefix[prefix] += 1
+            total_updates_per_prefix[prefix] += 1  # Increment updates per prefix
+            logger.debug(f"Incremented updates for prefix {prefix}: {total_updates_per_prefix[prefix]}")
+
     # Withdrawals
     total_prefixes_withdrawn = row.get('Target Prefixes Withdrawn', 0)
     if total_prefixes_withdrawn > 0:
         prefixes_withdrawn_str = row.get('Target Prefixes Withdrawn', '[]')
         prefixes_withdrawn_list = parse_prefix_list(prefixes_withdrawn_str, idx, 'Target Prefixes Withdrawn')
+        logger.debug(f"Row {idx}: Prefixes Withdrawn: {prefixes_withdrawn_list}")
         for prefix in prefixes_withdrawn_list:
             withdrawal = (
                 f"At {timestamp}, AS{as_number} withdrew the prefix: {prefix}. "
                 f"Total prefixes withdrawn: {int(total_prefixes_withdrawn)}."
             )
             prefix_withdrawals.append(withdrawal)
-            total_updates_per_prefix[prefix] += 1
-
+            total_updates_per_prefix[prefix] += 1  # Increment updates per prefix
+            logger.debug(f"Incremented updates for prefix {prefix}: {total_updates_per_prefix[prefix]}")
 
 def parse_prefix_list(prefixes_str, idx, column_name):
     prefixes_list = []
