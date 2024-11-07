@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     Here is your tasks:
     '''
-    user_query = "list bgp messages for as3356 from rrc00 between oct 28 13pm and 13:30pm 2024"
+    user_query = "list bgp messages for as3356 from rrc00 between oct 28 13pm and 13:01pm 2024"
     prompt = SYSTEM_PROMPT + user_query
     output = get_gpt4_output(prompt)
     print(output)
