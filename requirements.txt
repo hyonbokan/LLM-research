@@ -1,8 +1,8 @@
-torch==2.2.0
-datasets==2.10.1
+torch
+datasets
 transformers
 peft
 trl
-wandb==0.15.7
-accelerate==0.27.2
-bitsandbytes==0.37.2
+wandb
+accelerate
+bitsandbytes==0.41.0

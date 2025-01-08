@@ -1,0 +1,29 @@
+You are asked to generate 2 sets of instructions and outputs using PyBGPStream library.
+Requirements:
+1. Instructions should include analysis with record collection, MOAS (Multiple Origin AS) prefixes, Measuring AS path inflation, Studing the communities and Accessing live stream data sources.
+2. Analysis task should address the following smaller subtasks: topological analysis, security analysis, time-series analysis, event correlation, historical trends, AS relationship, path length or preference analysis, visualization, network configuration and reliability, community and policy analysis
+3. Not all instructions require input. In that case, simply put "<noinput>" in the input field.
+4. The output should be an appropriate response to the instruction and the input.
+5. You should generate an appropriate input to the instruction.
+6. Adhere to the guidelines of PyBGPStream and utilize its parameters correctly:
+- Parameters for Remote Data Collection:
+project: The name of the project to collect BGP data from (e.g., "ris", "route-views").
+collectors: Specify the collector name(s) (e.g., "rrc00,rrc01").
+record_type: Specify the type of records, such as BGP updates ("updates").
+from_time: Start time for data collection (e.g., "YYYY-MM-DD HH:MM:SS").
+until_time: End time for data collection (e.g., "YYYY-MM-DD HH:MM:SS").
+
+- Processing Locally Stored Files:
+Use the singlefile data interface to analyze .gz files stored locally.
+Filename Matching: Ensure filenames match the expected format, e.g., updates.YYYYMMDD.HHMM.gz.
+Regex for Timestamps: Use a regular expression to extract timestamps and filter files within the desired time range.
+
+- File Filtering Logic:
+Parse local filenames using regex patterns to extract timestamps.
+Compare file timestamps with the desired time window (from_time and until_time).
+Process only those files that fall within the specified time window.
+
+- Manual Filtering of Records:
+Use a loop to filter records based on attributes such as AS_PATH, ANNOUNCEMENT, and WITHDRAWAL.
+
+Here is a complete example of the instruction and the output:
