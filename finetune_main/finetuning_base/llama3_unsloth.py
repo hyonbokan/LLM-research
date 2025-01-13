@@ -1,61 +1,67 @@
-import torch
-from unsloth import FastLanguageModel
+import os
 import torch
 from torch import cuda, bfloat16
 from datasets import load_dataset
-import os
+from unsloth import FastLanguageModel, is_bfloat16_supported
+from trl import SFTTrainer
+from transformers import TrainingArguments
 
-print(f"PyTorch version: {torch.__version__}")
-print(f"CUDA version: {torch.version.cuda}")
-
+# Configuration constants
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Available device: {DEVICE}")
-
-model_id = "unsloth/Meta-Llama-3.1-8B",
-
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-torch.cuda.set_device(device)
-
-max_seq_length = 2048
-dtype = None # None for auto detection. Float16 for Tesla T4, V100, Bfloat16 for Ampere+
-load_in_4bit = True
-
-model, tokenizer = FastLanguageModel.from_pretrained(
-    model_name = "unsloth/Meta-Llama-3.1-8B",
-    max_seq_length = max_seq_length,
-    dtype = dtype,
-    load_in_4bit = load_in_4bit,
-    token = "meta-llama/Meta-Llama-3.1-8B-Instruct",
-)
-
-model.eval()
-print(f"Model loaded on {device}")
-
-
-model = FastLanguageModel.get_peft_model(
-    model,
-    r = 16, # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
-    target_modules = ["q_proj", "k_proj", "v_proj", "o_proj",
-                      "gate_proj", "up_proj", "down_proj",],
-    lora_alpha = 16,
-    lora_dropout = 0, # Supports any, but = 0 is optimized
-    bias = "none",    # Supports any, but = "none" is optimized
-    # [NEW] "unsloth" uses 30% less VRAM, fits 2x larger batch sizes!
-    use_gradient_checkpointing = "unsloth", # True or "unsloth" for very long context
-    random_state = 3407,
-    use_rslora = False,  # We support rank stabilized LoRA
-    loftq_config = None, # And LoftQ
-)
-
-data = load_dataset("json", data_files="/home/hb/LLM-research/dataset/BGP/PyBGPStream/PyBGPStream_main10K.json")
-data["train"]
-
+MODEL_ID = "unsloth/Meta-Llama-3.1-8B"
 CUTOFF_LEN = 2048
+MAX_SEQ_LENGTH = 2048
+LOAD_IN_4BIT = True
+DTYPE = None  # Auto-detection; use bfloat16 for Ampere GPUs
+OUTPUT_DIR = "outputs"
+FINETUNED_MODEL_PATH = "/home/hb/dataset_bgp/finetuned_models/LLaMA3-8B-analysis-5k-unsloth"
+
+
+def setup_device():
+    """Configures the device for PyTorch."""
+    print(f"PyTorch version: {torch.__version__}")
+    print(f"CUDA version: {torch.version.cuda}")
+    print(f"Available device: {DEVICE}")
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    torch.cuda.set_device(device)
+    return device
+
+
+def load_model():
+    """Loads the pre-trained model and tokenizer."""
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=MODEL_ID,
+        max_seq_length=MAX_SEQ_LENGTH,
+        dtype=DTYPE,
+        load_in_4bit=LOAD_IN_4BIT,
+        token="meta-llama/Meta-Llama-3.1-8B-Instruct",
+    )
+    model.eval()
+    print(f"Model loaded on {DEVICE}")
+    return model, tokenizer
+
+
+def configure_model_for_training(model):
+    """Configures the model for LoRA-based training."""
+    return FastLanguageModel.get_peft_model(
+        model,
+        r=16,  # Suggested: 8, 16, 32, etc.
+        target_modules=[
+            "q_proj", "k_proj", "v_proj", "o_proj",
+            "gate_proj", "up_proj", "down_proj",
+        ],
+        lora_alpha=16,
+        lora_dropout=0,
+        bias="none",
+        use_gradient_checkpointing="unsloth",
+        random_state=3407,
+        use_rslora=False,
+        loftq_config=None,
+    )
+
 
 def generate_prompt(data_point):
-    """
-    Create the text prompt from your instruction, input, and output fields.
-    """
+    """Generates a text prompt from a dataset entry."""
     return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 
 ### Instruction:
@@ -67,31 +73,21 @@ def generate_prompt(data_point):
 ### Response:
 {data_point["output"]}"""
 
-def tokenize(prompt, add_eos_token=True):
-    """
-    Tokenizes the prompt. Optionally pads to max_length=2048 and appends an EOS token.
-    Copies input_ids to labels for causal LM.
-    """
-    # Here, we use padding="max_length" to get uniform-length sequences of 2048.
-    # Alternatively, you can use padding=False and rely on a data collator.
+
+def tokenize(prompt, tokenizer, add_eos_token=True):
+    """Tokenizes the prompt and optionally adds an EOS token."""
     result = tokenizer(
         prompt,
         truncation=True,
         max_length=CUTOFF_LEN,
-        padding="max_length",   # or padding=False + data_collator
-        return_tensors=None,    # return raw Python lists
+        padding="max_length",
+        return_tensors=None,
     )
 
     input_ids = result["input_ids"]
     attention_mask = result["attention_mask"]
 
-    # Optionally place an EOS token at the very end if there's room
-    if (
-        add_eos_token
-        and len(input_ids) == CUTOFF_LEN
-        and input_ids[-1] != tokenizer.eos_token_id
-    ):
-        # Replace last token with EOS if you'd like
+    if add_eos_token and len(input_ids) == CUTOFF_LEN and input_ids[-1] != tokenizer.eos_token_id:
         input_ids[-1] = tokenizer.eos_token_id
         attention_mask[-1] = 1
 
@@ -102,54 +98,72 @@ def tokenize(prompt, add_eos_token=True):
         "labels": labels,
     }
 
-def generate_and_tokenize_prompt(data_point):
-    """
-    Combines prompt generation with tokenization.
-    """
+
+def generate_and_tokenize_prompt(data_point, tokenizer):
+    """Combines prompt generation and tokenization."""
     full_prompt = generate_prompt(data_point)
-    return tokenize(full_prompt)
-
-# Example: split the "train" set into train/val
-train_val = data["train"].train_test_split(test_size=1000, shuffle=True, seed=42)
-train_data = train_val["train"].map(generate_and_tokenize_prompt)
-val_data   = train_val["test"].map(generate_and_tokenize_prompt)
+    return tokenize(full_prompt, tokenizer)
 
 
-from trl import SFTTrainer
-from transformers import TrainingArguments
-from unsloth import is_bfloat16_supported
+def prepare_data(tokenizer):
+    """Loads and processes the dataset."""
+    data = load_dataset("json", data_files="/home/hb/LLM-research/dataset/BGP/PyBGPStream/PyBGPStream_main10K.json")
+    train_val = data["train"].train_test_split(test_size=1000, shuffle=True, seed=42)
 
-trainer = SFTTrainer(
-    model = model,
-    tokenizer = tokenizer,
-    train_dataset = train_data,
-    eval_dataset = val_data,
-    dataset_text_field = "output",
-    max_seq_length = max_seq_length,
-    dataset_num_proc = 2,
-    packing = False, # Can make training 5x faster for short sequences.
-    args = TrainingArguments(
-        per_device_train_batch_size = 4,
-        gradient_accumulation_steps = 1,
-        warmup_steps = 5,
-        # num_train_epochs = 1, # Set this for 1 full training run.
-        max_steps = 5000,
-        learning_rate = 2e-4,
-        fp16 = not is_bfloat16_supported(),
-        bf16 = is_bfloat16_supported(),
-        logging_steps = 1,
-        optim = "adamw_8bit",
-        weight_decay = 0.01,
-        lr_scheduler_type = "cosine",
-        seed = 3407,
-        output_dir = "outputs",
-        report_to = "none",
-    ),
-)
+    train_data = train_val["train"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer))
+    val_data = train_val["test"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer))
 
-trainer_stats = trainer.train()
+    return train_data, val_data
 
-new_model = "/home/hb/dataset_bgp/finetuned_models/LLaMA3-8B-analysis-5k-unsloth"
 
-trainer.model.save_pretrained(new_model)
-tokenizer.save_pretrained(new_model)
+def train_model(model, tokenizer, train_data, val_data):
+    """Trains the model using the SFTTrainer."""
+    trainer = SFTTrainer(
+        model=model,
+        tokenizer=tokenizer,
+        train_dataset=train_data,
+        eval_dataset=val_data,
+        dataset_text_field="output",
+        max_seq_length=MAX_SEQ_LENGTH,
+        dataset_num_proc=2,
+        packing=False,
+        args=TrainingArguments(
+            per_device_train_batch_size=4,
+            gradient_accumulation_steps=1,
+            warmup_steps=5,
+            max_steps=5000,
+            learning_rate=2e-4,
+            fp16=not is_bfloat16_supported(),
+            bf16=is_bfloat16_supported(),
+            logging_steps=1,
+            optim="adamw_8bit",
+            weight_decay=0.01,
+            lr_scheduler_type="cosine",
+            seed=3407,
+            output_dir=OUTPUT_DIR,
+            report_to="none",
+        ),
+    )
+
+    trainer_stats = trainer.train()
+    return trainer
+
+
+def save_model(trainer):
+    """Saves the trained model and tokenizer."""
+    trainer.model.save_pretrained(FINETUNED_MODEL_PATH)
+    trainer.tokenizer.save_pretrained(FINETUNED_MODEL_PATH)
+    print(f"Model saved to {FINETUNED_MODEL_PATH}")
+
+
+def main():
+    device = setup_device()
+    model, tokenizer = load_model()
+    model = configure_model_for_training(model)
+    train_data, val_data = prepare_data(tokenizer)
+    trainer = train_model(model, tokenizer, train_data, val_data)
+    save_model(trainer)
+
+
+if __name__ == "__main__":
+    main()
