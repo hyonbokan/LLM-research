@@ -1,4 +1,4 @@
-You are asked to generate 2 sets of instructions and outputs using PyBGPStream library.
+You are asked to generate 2 sets of instructions and outputs using the PyBGPStream library, focusing on processing locally stored BGP update files.
 Requirements:
 1. Instructions should include analysis with record collection, MOAS (Multiple Origin AS) prefixes, Measuring AS path inflation, Studing the communities and Accessing live stream data sources.
 2. Analysis task should address the following smaller subtasks: topological analysis, security analysis, time-series analysis, event correlation, historical trends, AS relationship, path length or preference analysis, visualization, network configuration and reliability, community and policy analysis

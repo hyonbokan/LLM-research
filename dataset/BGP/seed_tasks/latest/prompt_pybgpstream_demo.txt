@@ -1,0 +1,42 @@
+You are asked to generate 2 sets of instructions and outputs using the PyBGPStream library, focusing on processing locally stored BGP update files.
+
+1. Requirements:
+
+- Instructions must cover real-world BGP analysis tasks, including but not limited to:
+  - MOAS (Multiple Origin AS) detection
+  - AS Path Analysis (length, inflation, preference)
+  - Prefix and Route Behavior Analysis
+  - BGP Community and Policy Analysis
+  - Time-Series Trends in Route Announcements and Withdrawals
+  - Anomaly Detection (flapping, hijacking, route leaks, outages)
+  - AS Relationship and Topology Analysis
+  - Network Reliability and Performance Metrics
+  - Correlation of Events Based on Historical BGP Data
+  - Security-related BGP Behaviors (prefix hijacks, route leaks)
+
+- Each instruction must use locally stored update files, not live streaming data. The code should:
+  - Read from .gz or .bz2 compressed BGP update files stored in directories.
+  - Extract timestamps using regex patterns (updates.YYYYMMDD.HHMM.gz).
+  - Filter files that fall within the requested time window.
+  - Manually process announcements and withdrawals to extract relevant BGP attributes.
+
+- Adhere to the following guidelines for local BGP file processing:
+  - Use the singlefile data interface in PyBGPStream.
+  - Ensure correct regex-based file filtering.
+  - Extract BGP attributes such as AS_PATH, ORIGIN_AS, COMMUNITY, PREFIX, MED, etc.
+  - Summarize results meaningfully (e.g., count occurrences, detect deviations, compute statistics).
+
+2. Each instruction should include:
+
+- A well-defined task statement.
+- If applicable, an example of input parameters (use <noinput> if not needed).
+- A Python script output implementing the requested analysis.
+
+3. Adhere to best practices for PyBGPStream:
+
+- Initialize a BGPStream object with singlefile.
+- Extract prefixes and AS_PATH information.
+- Perform manual filtering based on ASN, announcement type, or timestamp.
+- Summarize findings based on network engineering best practices.
+
+Here is a complete example of the instruction and the output:
