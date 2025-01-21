@@ -24,7 +24,6 @@ def encode_prompt_for_chat(prompt_instructions, system_text="/home/hb/LLM-resear
     Encode multiple prompt instructions into a chat message list.
     """
     # 1) Load or define your system/developer role messages
-    # e.g. developer instructions:
     with open(system_text, "r") as f:
         system_role_content = f.read()
 
