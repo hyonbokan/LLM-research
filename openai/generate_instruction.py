@@ -19,7 +19,7 @@ from openai_utils import (
     jload,
 )
 
-def encode_prompt_for_chat(prompt_instructions, system_text="/home/hb/LLM-research/dataset/BGP/instruct_finetune_seeds/prompt_pybgpstream.txt"):
+def encode_prompt_for_chat(prompt_instructions, system_text="/home/hb/LLM-research/dataset/BGP/seed_tasks/latest/prompt_pybgpstream_controlled.txt"):
     """
     Encode multiple prompt instructions into a chat message list.
     """
@@ -151,7 +151,7 @@ def post_process_chat_response(num_prompt_instructions, response):
 
 def generate_instruction_following_data(
     output_dir="./generated_instructions",
-    seed_tasks_path="/home/hb/LLM-research/dataset/BGP/instruct_finetune_seeds/seed_tasks_pybpgstream_legacy.jsonl",
+    seed_tasks_path="/home/hb/LLM-research/dataset/BGP/seed_tasks/latest/seed_tasks_local_bgpstream.jsonl",
     num_instructions_to_generate=50,
     model_name="gpt-4o",
     num_prompt_instructions=1,
@@ -159,7 +159,7 @@ def generate_instruction_following_data(
     temperature=0.7,
     top_p=1.0,
     num_cpus=4,
-    system_text="/home/hb/LLM-research/dataset/BGP/instruct_finetune_seeds/prompt_pybgpstream.txt",
+    system_text="/home/hb/LLM-research/dataset/BGP/seed_tasks/latest/prompt_pybgpstream_controlled.txt",
 ):
     """
     Generate instruction-following data by prompting GPT with seed instructions
@@ -179,7 +179,7 @@ def generate_instruction_following_data(
     # 2) Prepare output
     os.makedirs(output_dir, exist_ok=True)
     machine_instruction_data = []
-    regen_path = os.path.join(output_dir, "regen.json")
+    regen_path = os.path.join(output_dir, "test.json")
     if os.path.exists(regen_path):
         machine_instruction_data = jload(regen_path)
         print(f"Loaded {len(machine_instruction_data)} machine-generated instructions")
