@@ -152,10 +152,10 @@ def post_process_chat_response(num_prompt_instructions, response):
 def generate_instruction_following_data(
     output_dir="./generated_instructions",
     seed_tasks_path="/home/hb/LLM-research/dataset/BGP/seed_tasks/latest/seed_tasks_local_bgpstream.jsonl",
-    num_instructions_to_generate=50,
+    num_instructions_to_generate=5000,
     model_name="gpt-4o",
     num_prompt_instructions=1,
-    request_batch_size=2,
+    request_batch_size=1,
     temperature=0.7,
     top_p=1.0,
     num_cpus=4,
@@ -179,7 +179,7 @@ def generate_instruction_following_data(
     # 2) Prepare output
     os.makedirs(output_dir, exist_ok=True)
     machine_instruction_data = []
-    regen_path = os.path.join(output_dir, "test.json")
+    regen_path = os.path.join(output_dir, "test_3.json")
     if os.path.exists(regen_path):
         machine_instruction_data = jload(regen_path)
         print(f"Loaded {len(machine_instruction_data)} machine-generated instructions")
@@ -205,6 +205,7 @@ def generate_instruction_following_data(
         messages_batch = []
         for _ in range(request_batch_size):
             prompt_instructions = random.sample(seed_instruction_data, num_prompt_instructions)
+            print(f"[DEBUG] Selected Seed Instructions: {[p['instruction'] for p in prompt_instructions]}")
             messages = encode_prompt_for_chat(prompt_instructions, system_text=system_text)
             messages_batch.append(messages)
 
@@ -255,7 +256,7 @@ def generate_instruction_following_data(
                     all_instruction_tokens,
                 )
             rouge_scores = [score.fmeasure for score in rouge_scores]
-            if max(rouge_scores) > 0.7:
+            if max(rouge_scores) > 0.5:
                 continue  # Too similar to an existing instruction
             keep += 1
 

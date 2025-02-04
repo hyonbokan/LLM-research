@@ -8,7 +8,8 @@ from transformers import TrainingArguments
 
 # Configuration constants
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_ID = "unsloth/Meta-Llama-3.1-8B"
+# MODEL_ID = "unsloth/Meta-Llama-3.1-8B"
+MODEL_ID = "unsloth/Meta-Llama-3.1-8B-Instruct"
 CUTOFF_LEN = 2048
 MAX_SEQ_LENGTH = 2048
 LOAD_IN_4BIT = True
@@ -34,7 +35,7 @@ def load_model():
         max_seq_length=MAX_SEQ_LENGTH,
         dtype=DTYPE,
         load_in_4bit=LOAD_IN_4BIT,
-        token="meta-llama/Meta-Llama-3.1-8B-Instruct",
+        # token="meta-llama/Meta-Llama-3.1-8B-Instruct",
     )
     model.eval()
     print(f"Model loaded on {DEVICE}")
@@ -107,8 +108,8 @@ def generate_and_tokenize_prompt(data_point, tokenizer):
 
 def prepare_data(tokenizer):
     """Loads and processes the dataset."""
-    data = load_dataset("json", data_files="/home/hb/LLM-research/dataset/BGP/PyBGPStream/PyBGPStream_main10K.json")
-    train_val = data["train"].train_test_split(test_size=1000, shuffle=True, seed=42)
+    data = load_dataset("json", data_files="/home/hb/LLM-research/openai/generated_instructions/test_3.json")
+    train_val = data["train"].train_test_split(test_size=200, shuffle=True, seed=42)
 
     train_data = train_val["train"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer))
     val_data = train_val["test"].map(lambda x: generate_and_tokenize_prompt(x, tokenizer))

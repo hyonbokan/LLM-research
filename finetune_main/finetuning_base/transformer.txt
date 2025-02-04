@@ -1,0 +1,45 @@
+Name: bitsandbytes
+Version: 0.45.0
+Summary: k-bit optimizers and matrix multiplication routines.
+Home-page: https://github.com/bitsandbytes-foundation/bitsandbytes
+Author: Tim Dettmers
+Author-email: dettmers@cs.washington.edu
+License: MIT
+Location: /home/hb/.conda/envs/unsloth_env/lib/python3.10/site-packages
+Requires: numpy, torch, typing_extensions
+Required-by: unsloth
+---
+Name: peft
+Version: 0.14.0
+Summary: Parameter-Efficient Fine-Tuning (PEFT)
+Home-page: https://github.com/huggingface/peft
+Author: The HuggingFace team
+Author-email: benjamin@huggingface.co
+License: Apache
+Location: /home/hb/.local/lib/python3.10/site-packages
+Requires: accelerate, huggingface-hub, numpy, packaging, psutil, pyyaml, safetensors, torch, tqdm, transformers
+Required-by: unsloth, unsloth_zoo
+---
+Name: accelerate
+Version: 1.2.1
+Summary: Accelerate
+Home-page: https://github.com/huggingface/accelerate
+Author: The HuggingFace team
+Author-email: zach.mueller@huggingface.co
+License: Apache
+Location: /home/hb/.local/lib/python3.10/site-packages
+Requires: huggingface-hub, numpy, packaging, psutil, pyyaml, safetensors, torch
+Required-by: peft, trl, unsloth, unsloth_zoo
+---
+Name: transformers
+Version: 4.47.1
+Summary: State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow
+Home-page: https://github.com/huggingface/transformers
+Author: The Hugging Face team (past and future) with the help of all our contributors (https://github.com/huggingface/transformers/graphs/contributors)
+Author-email: transformers@huggingface.co
+License: Apache 2.0 License
+Location: /home/hb/.local/lib/python3.10/site-packages
+Requires: filelock, huggingface-hub, numpy, packaging, pyyaml, regex, requests, safetensors, tokenizers, tqdm
+Required-by: peft, trl, unsloth, unsloth_zoo
+Note: you may need to restart the kernel to use updated packages.
+\
