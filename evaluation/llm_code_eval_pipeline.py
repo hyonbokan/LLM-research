@@ -10,20 +10,20 @@ CUSTOM_MODEL = "hyonbokan/bgp-llama-3.1-instruct-10kSteps-2kDataset"
 BASE_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 MODEL_LOCK = Lock()
 
-# Global model and tokenizer
+# Global model, tokenizer, and pipeline
 model = None
 tokenizer = None
-
+pipe = None
 
 def load_model():
     """
-    Load the LLM model and tokenizer in a thread-safe manner.
+    Load the LLM model, tokenizer, and pipeline in a thread-safe manner.
     """
-    global model, tokenizer
+    global model, tokenizer, pipe
 
-    if model is None or tokenizer is None:
+    if model is None or tokenizer is None or pipe is None:
         with MODEL_LOCK:  # Prevents race conditions
-            if model is None or tokenizer is None:
+            if model is None or tokenizer is None or pipe is None:
                 try:
                     model_id = CUSTOM_MODEL
                     hf_auth = os.environ.get('HF_TOKEN')
@@ -44,53 +44,26 @@ def load_model():
                     tokenizer.padding_side = "left"
                     tokenizer.truncation_side = "left"
 
-                    print("Model and tokenizer loaded successfully")
+                    # Initialize pipeline
+                    pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=1012)
+
+                    print("Model, tokenizer, and pipeline loaded successfully")
                 except Exception as e:
                     print(f"Error loading model: {str(e)}")
                     raise
-    return model, tokenizer
-
+    return model, tokenizer, pipe
 
 def query_llm(prompt):
     """
-    Queries the LLM with a given prompt and returns the generated output.
+    Queries the LLM with a given prompt using the pipeline and returns the generated output.
     """
-    # print(f"\nProcessing query: {prompt}")
-    
     try:
-        model, tokenizer = load_model()
+        model, tokenizer, pipe = load_model()
 
-        # Tokenize input
-        inputs = tokenizer(
-            prompt,
-            return_tensors='pt',
-            padding=True,
-            truncation=True,
-            max_length=1500
-        )
+        # Generate response using pipeline
+        result = pipe(prompt)
+        generated_text = result[0]['generated_text']
 
-        input_ids = inputs.input_ids.to(model.device)
-        attention_mask = inputs.attention_mask.to(model.device)
-
-        # Generation settings
-        generation_kwargs = dict(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            max_new_tokens=1012,
-            do_sample=True,
-            temperature=0.2,
-            top_p=0.9,
-            top_k=50,
-            repetition_penalty=1.0,
-            eos_token_id=tokenizer.eos_token_id,
-            pad_token_id=tokenizer.pad_token_id,
-        )
-
-        # Generate response
-        generated_ids = model.generate(**generation_kwargs)
-
-        # Decode response
-        generated_text = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
         print("Generated text:\n")
         print(generated_text)
         print("\n")
@@ -100,7 +73,6 @@ def query_llm(prompt):
         print(f"Error during LLM query: {str(e)}")
         return None
 
-
 def extract_code_from_reply(llm_output):
     """
     Extracts Python code from LLM output.
@@ -108,7 +80,6 @@ def extract_code_from_reply(llm_output):
     code_pattern = r"```(?:\w+)?\s*\n(.*?)```"
     match = re.search(code_pattern, llm_output, re.DOTALL)
     return match.group(1).strip() if match else None
-
 
 def evaluate_code(code):
     """
@@ -129,7 +100,6 @@ def evaluate_code(code):
     except Exception as e:
         return {"status": "fail", "error_message": f"RuntimeError: {traceback.format_exc()}"}
 
-
 def process_prompts(file_path):
     """
     Processes a JSON file containing multiple prompts and evaluates each.
@@ -139,7 +109,7 @@ def process_prompts(file_path):
         with open(file_path, 'r') as f:
             instructions = json.load(f)
 
-        model, tokenizer = load_model()
+        model, tokenizer, pipe = load_model()
         total = len(instructions)
         passed = 0
 
@@ -211,7 +181,6 @@ def process_prompts(file_path):
     except Exception as e:
         print(f"Error processing prompts: {str(e)}")
         return {"total": 0, "passed": 0, "failed": 0, "level_summary": {}, "passed_tasks": []}
-
 
 if __name__ == "__main__":
     json_file_path = "/home/hb/LLM-research/evaluation/BGP/BGP_analysis_test.json"

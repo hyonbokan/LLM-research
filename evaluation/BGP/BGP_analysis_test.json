@@ -2,76 +2,76 @@
   {
     "task_name": "Basic BGP Update Collection",
     "level": 1,
-    "instruction": "Generate a Python script using `pybgpstream` to collect BGP update messages from route collector `rrc00`. The script should retrieve updates from `rrc00` for a specific **1-minute time range**. The output should display the timestamp, collector, and raw update message. The code must be written inside a code block using ```[code]```."
+    "instruction": "Generate a Python script to load a locally stored BGP update file and extract update messages. The script should process a **1-minute time range** of data, displaying the timestamp, source, and raw update message. The code must be written inside a code block."
   },
   {
     "task_name": "Filtering by Specific ASN",
     "level": 1,
-    "instruction": "Write a Python script using `pybgpstream` that collects BGP updates from `rrc00` but filters results to only include updates related to ASN 15169. The script should display timestamps, prefixes, and AS paths. The code must be provided inside a code block using ```[code]```."
+    "instruction": "Write a Python script that processes a local BGP update file and filters results to only include updates related to ASN 15169. The script should display timestamps, prefixes, and AS paths. The code must be provided inside a code block."
   },
   {
     "task_name": "Extracting Unique Prefix Announcements",
     "level": 1,
-    "instruction": "Create a Python script using `pybgpstream` to extract all unique prefixes announced in a given **one-minute time window** from `rrc00`. The script should remove duplicates and print the list of unique prefixes. Ensure the code block is enclosed within ```[code]```."
+    "instruction": "Create a Python script to extract all unique prefixes announced in a given **one-minute time window** from a local BGP data file. The script should remove duplicates and print the list of unique prefixes. Ensure the code block is enclosed within."
   },
   {
     "task_name": "Detecting Withdrawn Routes",
     "level": 1,
-    "instruction": "Develop a Python script using `pybgpstream` to detect all BGP route withdrawals within a specified **1-minute period** from `rrc00`. The output should include the timestamp, withdrawn prefix, and the ASN responsible for the withdrawal. The script should be enclosed within a code block using ```[code]```."
+    "instruction": "Develop a Python script to process a local BGP update file and detect all BGP route withdrawals within a specified **1-minute period**. The output should include the timestamp, withdrawn prefix, and the ASN responsible for the withdrawal. The script should be enclosed within a code block."
   },
   {
     "task_name": "Monitoring AS Path Changes",
     "level": 1,
-    "instruction": "Generate a Python script using `pybgpstream` that tracks AS path changes for a specific prefix over a **2-minute period** from `rrc00`. The output should show the prefix, previous AS path, and the new AS path whenever a change is detected. Ensure the code is inside a code block using ```[code]```."
+    "instruction": "Generate a Python script to track AS path changes for a specific prefix over a **2-minute period** by analyzing a local BGP update file. The output should show the prefix, previous AS path, and the new AS path whenever a change is detected. Ensure the code is inside a code block."
   },
   {
     "task_name": "Analyzing BGP Prefix Announcements by Multiple ASNs",
     "level": 2,
-    "instruction": "Write a Python script using `pybgpstream` to collect BGP prefix announcements from multiple ASNs (e.g., 15169, 3356, 7018) within a **2-minute window** from `rrc00`. The script should output the prefix, ASN, and timestamp of the announcement. Ensure the code block is enclosed within ```[code]```."
+    "instruction": "Write a Python script to analyze a local BGP update file and extract prefix announcements from multiple ASNs (e.g., 15169, 3356, 7018) within a **2-minute window**. The script should output the prefix, ASN, and timestamp of the announcement. Ensure the code block is enclosed within."
   },
   {
     "task_name": "Detecting Route Flapping Events",
     "level": 2,
-    "instruction": "Generate a Python script using `pybgpstream` that detects route flapping events within a **3-minute window** from `rrc00`. Route flapping is identified when a prefix is announced and withdrawn multiple times within a short period. The script should output the affected prefix, ASN, and number of flaps detected. Provide the code inside a ```[code]```."
+    "instruction": "Generate a Python script to detect route flapping events within a **3-minute window** by analyzing a locally stored BGP update file. Route flapping is identified when a prefix is announced and withdrawn multiple times within a short period. The script should output the affected prefix, ASN, and number of flaps detected. Provide the code inside a block."
   },
   {
-    "task_name": "Comparing AS Paths Between Different Route Collectors",
+    "task_name": "Comparing AS Paths Between Different Data Sources",
     "level": 2,
-    "instruction": "Develop a Python script using `pybgpstream` to compare AS paths for a specific prefix across at least **three different route collectors** including `rrc00`, within a **2-minute time window**. The output should display differences in AS paths for the same prefix as observed by different collectors. Ensure the code block is enclosed within ```[code]```."
+    "instruction": "Develop a Python script to compare AS paths for a specific prefix by analyzing multiple local BGP data files from different sources. The output should display differences in AS paths for the same prefix as observed in different datasets. Ensure the code block is enclosed within."
   },
   {
     "task_name": "Identifying the Most Announced Prefixes",
     "level": 2,
-    "instruction": "Create a Python script using `pybgpstream` to identify the top 10 most frequently announced prefixes over a **2-minute period** from `rrc00`. The output should include the prefix and the number of announcements. The script must be enclosed in a code block using ```[code]```."
+    "instruction": "Create a Python script to analyze a local BGP update file and identify the top 10 most frequently announced prefixes over a **2-minute period**. The output should include the prefix and the number of announcements. The script must be enclosed in a code block."
   },
   {
     "task_name": "Detecting MOAS (Multiple Origin AS) Conflicts",
     "level": 2,
-    "instruction": "Generate a Python script using `pybgpstream` to detect Multiple Origin AS (MOAS) conflicts over a given **2-minute period** from `rrc00`. A MOAS conflict occurs when the same prefix is announced by more than one ASN. The script should output the conflicting prefix, the ASNs involved, and the timestamps of announcements. Provide the code inside a ```[code]```."
+    "instruction": "Generate a Python script to analyze a local BGP dataset and detect Multiple Origin AS (MOAS) conflicts over a given **2-minute period**. A MOAS conflict occurs when the same prefix is announced by more than one ASN. The script should output the conflicting prefix, the ASNs involved, and the timestamps of announcements. Provide the code inside a block."
   },
   {
     "task_name": "Identifying Hijacked Prefixes",
     "level": 3,
-    "instruction": "Write a Python script using `pybgpstream` to detect potential BGP prefix hijacks from `rrc00` within a **5-minute time window**. A hijack occurs when a prefix is announced by an ASN that is not typically associated with it. Use a reference dataset or assume a known ASN-to-prefix mapping. The script should output the prefix, the legitimate ASN, the hijacking ASN, and the timestamp. Ensure the code block is enclosed within ```[code]```."
+    "instruction": "Write a Python script to detect potential BGP prefix hijacks within a **5-minute time window** by analyzing a locally stored dataset. A hijack occurs when a prefix is announced by an ASN that is not typically associated with it. Use a reference dataset or assume a known ASN-to-prefix mapping. The script should output the prefix, the legitimate ASN, the hijacking ASN, and the timestamp. Ensure the code block is enclosed within."
   },
   {
     "task_name": "Analyzing AS Path Prepending Behavior",
     "level": 3,
-    "instruction": "Generate a Python script using `pybgpstream` to analyze AS path prepending behavior from `rrc00` within a **3-minute window**. AS path prepending is a technique where an ASN intentionally repeats its own AS number in the path to influence route selection. The script should track prefixes where prepending occurs and output the prefix, AS path, and the number of prepended entries. Provide the code inside a ```[code]```."
+    "instruction": "Generate a Python script to analyze AS path prepending behavior within a **3-minute window** by processing a local BGP update file. AS path prepending is a technique where an ASN intentionally repeats its own AS number in the path to influence route selection. The script should track prefixes where prepending occurs and output the prefix, AS path, and the number of prepended entries. Provide the code inside a block."
   },
   {
     "task_name": "Detecting Sudden BGP Route Growth Events",
     "level": 3,
-    "instruction": "Develop a Python script using `pybgpstream` to identify sudden increases in the number of BGP route announcements within a **5-minute period** from `rrc00`. The script should compare route counts and flag any spikes exceeding a given threshold (e.g., 50% increase). The output should include the timestamp, affected ASN(s), and the percentage increase. Ensure the code block is enclosed within ```[code]```."
+    "instruction": "Develop a Python script to identify sudden increases in the number of BGP route announcements within a **5-minute period** by analyzing a local BGP dataset. The script should compare route counts and flag any spikes exceeding a given threshold (e.g., 50% increase). The output should include the timestamp, affected ASN(s), and the percentage increase. Ensure the code block is enclosed within."
   },
   {
     "task_name": "Tracking Longest AS Paths in Routing Data",
     "level": 3,
-    "instruction": "Create a Python script using `pybgpstream` to find the longest AS paths in routing data within a **3-minute time range** from `rrc00`. The script should compute the path length for each observed route and output the top 10 longest AS paths along with their respective prefixes. Provide the code inside a ```[code]```."
+    "instruction": "Create a Python script to find the longest AS paths in routing data within a **3-minute time range** by analyzing a locally stored BGP dataset. The script should compute the path length for each observed route and output the top 10 longest AS paths along with their respective prefixes. Provide the code inside a block."
   },
   {
     "task_name": "Detecting BGP Route Leaks",
     "level": 3,
-    "instruction": "Generate a Python script using `pybgpstream` to detect BGP route leaks from `rrc00` within a **3-minute period**. A route leak occurs when an ASN improperly announces routes it learned from its upstream provider. The script should identify cases where a non-tier-1 ASN announces routes that do not belong to its customer cone. The output should include the leaking ASN, the affected prefix, and the timestamp. Provide the code inside a ```[code]```."
+    "instruction": "Generate a Python script to detect BGP route leaks within a **3-minute period** by analyzing a locally stored BGP dataset. A route leak occurs when an ASN improperly announces routes it learned from its upstream provider. The script should identify cases where a non-tier-1 ASN announces routes that do not belong to its customer cone. The output should include the leaking ASN, the affected prefix, and the timestamp. Provide the code inside a block."
   }
 ]

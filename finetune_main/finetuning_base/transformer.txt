@@ -42,4 +42,3 @@ Location: /home/hb/.local/lib/python3.10/site-packages
 Requires: filelock, huggingface-hub, numpy, packaging, pyyaml, regex, requests, safetensors, tokenizers, tqdm
 Required-by: peft, trl, unsloth, unsloth_zoo
 Note: you may need to restart the kernel to use updated packages.
-\
