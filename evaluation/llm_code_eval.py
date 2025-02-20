@@ -76,9 +76,9 @@ def query_llm(prompt):
         generation_kwargs = dict(
             input_ids=input_ids,
             attention_mask=attention_mask,
-            max_new_tokens=1012,
+            max_new_tokens=912,
             do_sample=True,
-            temperature=0.2,
+            temperature=0.3,
             top_p=0.9,
             top_k=50,
             repetition_penalty=1.0,

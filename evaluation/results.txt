@@ -1,6 +1,23 @@
-=== Final Summary ===: bgp-llama-3.1-instruct
-Total: 15, Passed: 13, Failed: 2
+=== Final Summary ===: bgp-llama-3.1-instruct (generation_kwargs)
+Total: 15, Passed: 14, Failed: 1
 Level-wise Summary:
-level_1: 5/5 passed
+level_1: 4/5 passed
 level_2: 5/5 passed
-level_3: 3/5 passed
+level_3: 5/5 passed
+
+        # Generation settings
+        generation_kwargs = dict(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            max_new_tokens=912,
+            do_sample=True,
+            temperature=0.3,
+            top_p=0.9,
+            top_k=50,
+            repetition_penalty=1.0,
+            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.pad_token_id,
+        )
+
+
+
