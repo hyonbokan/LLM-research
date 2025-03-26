@@ -15,14 +15,13 @@ For practical examples of how prompts are utilized in specific contexts, explore
 
 ### Running the Self-instruct Code
 
-- **utils.py**: The script manages the connection to OpenAI's GPT models and handles the communication process. The script manages decoding arguments, rate-limiting with sleep intervals, batching of prompts for efficiency, and the handling of API responses. 
-`IMPORTANT!`: After the OpenAI API updates in 2024, older models are deprecated. Thus, `utils.py` must be updated to align with the current API standards and model availability.
+- **openai_utils.py**: The script manages the connection to OpenAI's GPT models and handles the communication process. The script manages decoding arguments, rate-limiting with sleep intervals, batching of prompts for efficiency, and the handling of API responses. 
 
 - **generate_instruction.py**: The main script for the self-instruct framework. Before running it, you need to modify the script to specify the directory paths for the [prompts](/images/self_instruct1.png) and [seed tasks](/images/self_instruct2.png). The script then loads, encodes these components, and generates new sets of instructions. 
 To execute the script, use the following command line example, ensuring to replace `--model_name` with the current model you intend to use and adjust `--num_instructions_to_generate` as needed:
 
 ```shell
-python -m generate_instruction generate_instruction_following_data --num_instructions_to_generate=1000 --model_name="text-davinci-003"
+python -m generate_instruction generate_instruction_following_data --num_instructions_to_generate=1000 --model_name="gpt-4o"
 ```
 
 ## 2. Instruction Fine-tuning
